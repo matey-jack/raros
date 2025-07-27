@@ -2,44 +2,57 @@
 Rangier Roboter Systemanalyse und Konzeption, Abteilung Entity-Relationship Diagramme
 
 ```mermaid
----
-title: Entities & Relationships für den Gleisplan
----
-erDiagram
-    WEICHE {
-        %% Unveränderliche Eigenschaften %%
-        %% Liegt die Weiche mit der Spitze in aufsteigender Richtung der Kilometrierung?
-        bool spitze_aufsteigend
-        
-        %% Aktueller Zustand %%
-        bool befahrbar
-        bool verstellbar
-        %% Aktuelle Lage der Weiche. Wenn nicht 'gerade' dann 'abzweigend'.
-        bool liegt_gerade
-    }
-    WEICHE many(0)..1 GLEIS_ABSCHNITT : Spitze
-    WEICHE many(0)..1 GLEIS_ABSCHNITT : Gerade
-    WEICHE many(0)..1 GLEIS_ABSCHNITT : Abzweig
+    C4Context
+      title Systemdefinition Rangierroboter
+      Enterprise_Boundary(logisticsCompany, "Logistik-Unternehmen") {
+        System(dispoSystem, "Dispo-System")
+      }
+      Enterprise_Boundary(theYard, "Rangierbahnhof") {
+        System_Ext(infraStatic, "Beschreibung Infrastruktur")
+        System(infraDynamic, "Weichensteuerung")
+        System(raros, "RaRoS")
+        System(locomotive, "Lokomotive")
+        Person(personA, "Rangierbegleiter")
+        Person(personB, "Überwacher / Passant")
+      }
 
-    GLEIS_ABSCHNITT {
-        int start_in_metern
-        int ende_in_metern
-        %% Optionaler Wert; leer bei Zwischenabschnitten auf denen keine Wagen stehen gelassen werden
-        string nummer
-    }
+      Rel(infraStatic, raros, "")
+      BiRel(raros, dispoSystem, "")
+      BiRel(raros, locomotive, "")
+      BiRel(raros, infraDynamic, "")
+      BiRel(raros, personA, "")
+      BiRel(raros, personB, "")
 ```
 
-
 ```mermaid
----
-title: Entities & Relationships für die Rangieraufgabe
----
-erDiagram
-    GLEIS {
-        string nummer
-    }
-    WAGEN {
-        string nummer        
-    }
-    WAGEN many(0)..1 GLEIS 
+    C4Component
+      title Systemdefinition Rangierroboter
+      Enterprise_Boundary(logisticsCompany, "Logistik-Unternehmen") {
+        System(dispoSystem, "Dispo-System")
+      }
+      Enterprise_Boundary(theYard, "Rangierbahnhof") {
+        System_Ext(infraStatic, "Beschreibung Infrastruktur")
+        System(infraDynamic, "Weichensteuerung")
+        System_Boundary(raros, "RaRoS") {
+          Component(planner, "Rangier-Planung")
+          Component(executor, "Gesamt-Steuerung")
+          Component(driver, "Lok-Steuerung")
+          Component(switcher, "Weichen-Steuerung")
+          Component(gui, "Bedienoberfläche Rangierbegleiter")
+        }
+        System(locomotive, "Lokomotive")
+        Person(personA, "Rangierbegleiter")
+        Person(personB, "Überwacher / Passant")
+      }
+
+        Rel(infraStatic, planner, "")
+        BiRel(planner, dispoSystem, "")
+        BiRel(planner, executor, "")
+        BiRel(executor, driver, "")
+        BiRel(executor, switcher, "")
+        BiRel(executor, gui, "")
+        BiRel(driver, locomotive, "")
+        BiRel(switcher, infraDynamic, "")
+        BiRel(gui, personA, "")
+        BiRel(gui, personB, "")
 ```
