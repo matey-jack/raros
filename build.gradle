@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+}
+
+group = "robertw"
+version = "1.0-SNAPSHOT"
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(24)
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url = uri("http://dev.ebuef.de/maven2")
+        allowInsecureProtocol = true
+    }
+}
+
+dependencies {
+    implementation('de.tuberlin.bbi:drControl:1.1.0')
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation('org.junit.jupiter:junit-jupiter')
+}
