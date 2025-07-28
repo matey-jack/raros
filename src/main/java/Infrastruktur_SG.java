@@ -1,6 +1,7 @@
 import de.tuberlin.bbi.dr.LayoutController;
 import de.tuberlin.bbi.dr.Turnout.Position;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -10,6 +11,9 @@ public class Infrastruktur_SG {
     private static final int W3 = 383;
     private static final int W4 = 382;
 
+    public static List<Integer> allTrackSections = List.of(34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48);
+    public static int MIDDLE_TRACK_SECTION = 40;
+
     public static Gleisharfe LinkeSeite = new Gleisharfe(Map.of(
             1, Set.of(new FahrwegElement(W1, Position.CLOSED)),
             2, Set.of(
@@ -17,7 +21,7 @@ public class Infrastruktur_SG {
                     new FahrwegElement(W2, Position.CLOSED)
             )
     )) {
-        boolean initialize() {
+        public boolean initialize() {
             var w3 = LayoutController.turnoutByAddress(W3);
             w3.setPosition(Position.CLOSED);
             var w4 = LayoutController.turnoutByAddress(W4);
