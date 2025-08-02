@@ -1,5 +1,6 @@
-# raros
-Rangier Roboter Systemanalyse und Konzeption, Abteilung Entity-Relationship Diagramme
+# RaRoS - Rangier Roboter System
+
+## Analyse und Konzeption: Kontext und System
 
 ```mermaid
     C4Context
@@ -56,3 +57,9 @@ Rangier Roboter Systemanalyse und Konzeption, Abteilung Entity-Relationship Diag
         BiRel(gui, personA, "")
         BiRel(gui, personB, "")
 ```
+
+## Spezifikation
+
+### Rangierplan
+
+siehe [src/main/java/raros/plan/specification.md](src/main/java/raros/plan/specification.md)

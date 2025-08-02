@@ -1,0 +1,44 @@
+{
+  "datatype": "yard-tracks-car-order/target",
+  "version": "beta-1",
+  "payload": {
+    "tracks": {
+      "42": {
+        "trains": [
+          {
+            "carPackets": [
+              {
+                "cars": [
+                  "010",
+                  "011",
+                  "001",
+                  "003"
+                ]
+              },
+              {
+                "cars": [
+                  "002",
+                  "005"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "41": {
+        "trains": [
+          {
+            "carPackets": [
+              {
+                "cars": [
+                  "012",
+                  "004"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
