@@ -6,8 +6,8 @@ public record ShuntingStep(
    String fromTrack,
    String toTrack,
 
-   // The order here is with index 0 being at the locomotive, such that taking a car from the track and coupling it to
-   // the cars to be transported will pop and push it at the ends of each list.
+   // The order here is with the highest index being at the locomotive.
+   // This keeps the same sequence as in the track state and makes it easy to read.
    List<String> pickCars,
 
    // `dropCars` are the same car-IDs as `pickCars`, in the same order, but grouped according to how they should be decoupled.

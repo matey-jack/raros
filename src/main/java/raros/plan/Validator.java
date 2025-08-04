@@ -95,6 +95,20 @@ public class Validator {
         }
     }
 
+    public List<String> checkPlan(ShuntingPlan plan) {
+        List<String> report = new ArrayList<>();
+        for (var step : plan.steps()) {
+            checkStep(step, report);
+        }
+        return report;
+    }
+
+    private void checkStep(ShuntingStep step, List<String> report) {
+        // TODO: especially check that cars don't change order between pick and drop,
+        //       because the simulator trusts this.
+        // also check that target track exists in infrastructure, because the simulator also trusts this.
+    }
+
     public List<String> checkResult(Tracks<TrainState> state, Tracks<TrainRequest> target) {
         List<String> report = new ArrayList<>();
         // TODO: check that keySet are the same
@@ -109,6 +123,7 @@ public class Validator {
             report.add(
                     "Track " + track + " has " + trains.size() + " trains, " +
                             "but should have " + requests.size() + ".");
+            return;
         }
         for (var i = 0; i < trains.size(); i++) {
             checkTrain(track, i, trains.get(i), requests.get(i), report);
@@ -121,6 +136,7 @@ public class Validator {
             report.add(
                     "Train " + trainNumber + " on track " + track + ":" +
                             " expected " + targetSize + " cars, but only got " + train.carIds().size() + ".");
+            return;
         }
         var statePackets = packetize(train.carIds(), request.carPackets());
         for (var i = 0; i < statePackets.size(); i++) {

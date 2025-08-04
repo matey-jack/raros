@@ -6,56 +6,50 @@
       {
         "fromTrack": "45",
         "toTrack": "43",
-        "pickCars": ["001"],
-        "dropCars": [["001"]]
-      },
-      {
-        "fromTrack": "45",
-        "toTrack": "42",
-        "pickCars": ["002"],
-        "dropCars": [["002"]]
-      },
-      {
-        "fromTrack": "45",
-        "toTrack": "43",
-        "pickCars": ["003"],
-        "dropCars": [["003", "001"]]
+        "pickCars": ["005"],
+        "dropCars": [["005"]]
       },
       {
         "fromTrack": "45",
         "toTrack": "41",
-        "pickCars": ["004"],
-        "dropCars": [["004"]]
+        "pickCars": ["003", "004"],
+        "dropCars": [["003", "004"]]
+      },
+      {
+        "fromTrack": "45",
+        "toTrack": "43",
+        "pickCars": ["002"],
+        "dropCars": [["005", "002"]]
       },
       {
         "fromTrack": "45",
         "toTrack": "42",
-        "pickCars": ["005"],
-        "dropCars": [["005", "002"]]
-      },
-      {
-        "fromTrack": "44",
-        "toTrack": "43",
-        "pickCars": ["010"],
-        "dropCars": [["010", "003"]]
-      },
-      {
-        "fromTrack": "44",
-        "toTrack": "43",
-        "pickCars": ["011"],
-        "dropCars": [["011", "010"]]
+        "pickCars": ["001"],
+        "dropCars": [["001"]]
       },
       {
         "fromTrack": "44",
         "toTrack": "41",
         "pickCars": ["012"],
-        "dropCars": [["012", "004"]]
+        "dropCars": [["004", "012"]]
+      },
+      {
+        "fromTrack": "44",
+        "toTrack": "42",
+        "pickCars": ["011"],
+        "dropCars": [["001", "011"]]
+      },
+      {
+        "fromTrack": "44",
+        "toTrack": "42",
+        "pickCars": ["010"],
+        "dropCars": [["011", "010"]]
       },
       {
         "fromTrack": "43",
         "toTrack": "42",
-        "pickCars": ["011", "010", "003", "001"],
-        "dropCars": [["011", "010", "003", "001"]]
+        "pickCars": ["005", "002"],
+        "dropCars": [["010", "005", "002"]]
       }
     ]
   }
