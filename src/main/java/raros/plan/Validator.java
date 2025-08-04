@@ -86,8 +86,8 @@ public class Validator {
     static void checkTrackAvailability(Tracks<TrainState> given, Tracks<TrainRequest> target, List<String> availableTracks, List<String> result) {
         var givenTracks = given.tracks().keySet();
         var targetPackets = target.tracks().values().stream()
-                .map((t) -> t.trains().size())
-                .reduce(0, Integer::sum);
+                .mapToInt((t) -> t.trains().size())
+                .sum();
         if (givenTracks.size() + targetPackets > availableTracks.size()) {
             result.add(givenTracks.size() + " tracks are occupied at beginning, and " +
                     targetPackets + " tracks are needed to form the target car packets, but only " +
@@ -140,8 +140,8 @@ public class Validator {
         }
         var statePackets = packetize(train.carIds(), request.carPackets());
         for (var i = 0; i < statePackets.size(); i++) {
-            var actualCars = statePackets.get(i);
-            var expectedCars = request.carPackets().get(i);
+            var actualCars = new HashSet<>(statePackets.get(i));
+            var expectedCars = new HashSet<>(request.carPackets().get(i));
             if (!actualCars.equals(expectedCars)) {
                 report.add(
                         "Car packet " + i + " of train " + trainNumber + " on track " + track + " has wrong car(s): " +
