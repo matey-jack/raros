@@ -46,6 +46,12 @@
         "dropCars": [["010"]]
       },
       {
+        "fromTrack": "44",
+        "toTrack": "41",
+        "pickCars": ["008", "009"],
+        "dropCars": [[], ["008", "009"]]
+      },
+      {
         "fromTrack": "43",
         "toTrack": "42",
         "pickCars": ["005", "002"],

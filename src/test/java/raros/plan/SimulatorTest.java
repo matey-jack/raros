@@ -2,6 +2,8 @@ package raros.plan;
 
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 class SimulatorTest {
     PlanSerde serde = new PlanSerde();
 
@@ -16,5 +18,6 @@ class SimulatorTest {
         for (var line : report) {
             System.out.println(line);
         }
+        assertThat(report).isEmpty();
     }
 }

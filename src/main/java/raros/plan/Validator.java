@@ -95,18 +95,26 @@ public class Validator {
         }
     }
 
-    public List<String> checkPlan(ShuntingPlan plan) {
+    public List<String> validatePlan(ShuntingPlan plan, List<String> availableTracks) {
         List<String> report = new ArrayList<>();
         for (var step : plan.steps()) {
-            checkStep(step, report);
+            checkStep(step, availableTracks, report);
         }
         return report;
     }
 
-    private void checkStep(ShuntingStep step, List<String> report) {
-        // TODO: especially check that cars don't change order between pick and drop,
-        //       because the simulator trusts this.
-        // also check that target track exists in infrastructure, because the simulator also trusts this.
+    private void checkStep(ShuntingStep step, List<String> availableTracks, List<String> report) {
+        if (!availableTracks.contains(step.fromTrack())) {
+            report.add("fromTrack " + step.fromTrack() + " is not available in the infrastructure.");
+        }
+        if (!availableTracks.contains(step.toTrack())) {
+            report.add("toTrack " + step.toTrack() + " is not available in the infrastructure.");
+        }
+        var dropCars = step.dropCars().stream().flatMap(List::stream).toList();
+        if (!step.pickCars().equals(dropCars)) {
+            report.add("pickCars [" + String.join(", ", step.pickCars()) + "]" +
+                    " does not match dropCars [" + String.join(", ", dropCars) + "].");
+        }
     }
 
     public List<String> checkResult(Tracks<TrainState> state, Tracks<TrainRequest> target) {
