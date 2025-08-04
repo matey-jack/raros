@@ -1,5 +1,7 @@
 package raros.plan;
 
-public record Train(
-    CarPaket[] carPackets
-) {}
+import java.util.List;
+
+public interface Train {
+    List<String> getAllCarIds();
+}

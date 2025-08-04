@@ -1,5 +1,7 @@
 package raros.plan;
 
+import java.util.List;
+
 public record ShuntingPlan(
-        ShuntingStep[] steps
+        List<ShuntingStep> steps
 ) { }

@@ -1,5 +1,6 @@
 package raros.plan;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
@@ -8,10 +9,26 @@ import java.io.File;
 public class PlanSerde {
     ObjectMapper objectMapper = new ObjectMapper();
 
-    Tracks readState(String filename) {
+    <T> T read(String filename) {
         try {
             var envelope = objectMapper.readValue(new File(filename), Envelope.class);
-            return objectMapper.convertValue(envelope.payload(), Tracks.class);
+            TypeReference typeRef = RarosDataType.getClassFor(envelope.datatype());
+            if (typeRef == null) {
+                throw new RuntimeException(
+                        "Data type '" + envelope.datatype() + "' in file is not recognized."
+                );
+            }
+            // TODO: fix this, if possible
+            // maybe we need to change the code to use "JavaType" instead
+            // like JavaType javaType = objectMapper.getTypeFactory().constructParametricType(Tracks.class, TrainState.class);
+//            if (foundClass != dataClass) {
+//                throw new RuntimeException(
+//                        "Data type '" + envelope.datatype() + "' in file " +
+//                                "is for class '" + foundClass.getName() + "' " +
+//                                "which does not match requested " + dataClass.getName()
+//                );
+//            }
+            return (T) objectMapper.convertValue(envelope.payload(), typeRef);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -6,7 +6,7 @@ in der Realität wäre es natürlich am besten, wenn sie weltweit eindeutig sind
 reserviert und dann eindeutige Suffixe vergibt.
 
 Im Rangierplan spielt zunächst nur die Reihenfolge der Wagen auf den Gleisen eine Rolle, daher wird nur diese in den 
-Schnittstellen übergeben, und zwar einfach durch Listen, immer von vorn (Seite des Ausziehgleises) nach hinten.
+Schnittstellen übergeben, und zwar einfach durch Listen, wobei das Ausziehgleis am Ende der Liste ist (weil man von dort ja Wagen anfügt und wegnimmt).
 Wenn die Lok einen Annäherungssensor (z.B. in Form des Rangierbegleiters) hat, reicht es auch schon, um das Rangieren durchzuführen.
 Alternativ können die Zentimeter-genauen Positionen der Wagen noch in einem separaten Datensatz übergeben werden, 
 aber eigentlich braucht man doch sowieso den Annäherungssensor bzw. eine Kamera.
