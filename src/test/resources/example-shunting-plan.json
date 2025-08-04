@@ -19,7 +19,7 @@
         "fromTrack": "45",
         "toTrack": "43",
         "pickCars": ["002"],
-        "dropCars": [["005", "002"]]
+        "dropCars": [["002"]]
       },
       {
         "fromTrack": "45",
@@ -31,25 +31,25 @@
         "fromTrack": "44",
         "toTrack": "41",
         "pickCars": ["012"],
-        "dropCars": [["004", "012"]]
+        "dropCars": [["012"]]
       },
       {
         "fromTrack": "44",
         "toTrack": "42",
         "pickCars": ["011"],
-        "dropCars": [["001", "011"]]
+        "dropCars": [["011"]]
       },
       {
         "fromTrack": "44",
         "toTrack": "42",
         "pickCars": ["010"],
-        "dropCars": [["011", "010"]]
+        "dropCars": [["010"]]
       },
       {
         "fromTrack": "43",
         "toTrack": "42",
         "pickCars": ["005", "002"],
-        "dropCars": [["010", "005", "002"]]
+        "dropCars": [["005", "002"]]
       }
     ]
   }

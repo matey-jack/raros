@@ -65,18 +65,13 @@ public class Simulator {
     }
 
     void addCars(List<List<String>> packets, List<TrainState> trains) {
-        // TODO: repeating the last car number for coupling seems error-prone and also makes it impossible to validate the plan without simulating it.
-        //       change the spec such that coupling is the default and an empty packet is at index 0 of dropCars to make it not couple.
-        //       This will actually automatically work and not need extra logic!!
-        if (!trains.isEmpty() && trains.getLast().carIds().getLast().equals(packets.getFirst().getFirst())) {
-            // remove the duplicated car
-            packets.getFirst().removeFirst();
-            // add the first packet to the last train
+        // if there is already something on the target track, add the first packet to the last train
+        if (!trains.isEmpty()) {
             trains.getLast().carIds().addAll(packets.getFirst());
             packets.removeFirst();
         }
         // add all other packets as separate trains
-        for (var p: packets) {
+        for (var p : packets) {
             trains.add(new TrainState(p));
         }
     }
