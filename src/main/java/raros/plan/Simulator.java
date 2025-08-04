@@ -12,9 +12,43 @@ import java.util.Map;
     and adapt easily to any states different from how they were reported to be.
  */
 public class Simulator {
-    final Map<String, TrackTrains> currentState;
-    Simulator(Tracks given) {
+    private final Map<String, TrackTrains<TrainState>> currentState;
+
+    public static Tracks<TrainState> simulate(Tracks<TrainState> given, ShuntingPlan plan) {
+        var sim = new Simulator(given);
+        sim.processPlan(plan);
+        return new Tracks<>(sim.currentState);
+    }
+
+    Simulator(Tracks<TrainState> given) {
         currentState = given.tracks();
+    }
+
+    private void processPlan(ShuntingPlan plan) {
+        for (var step : plan.steps()) {
+            processStep(step);
+        }
+    }
+
+    void processStep(ShuntingStep step) {
+        var originTrack = currentState.get(step.fromTrack());
+        removeCars(step.pickCars(), originTrack);
+        var targetTrack = currentState.get(step.toTrack());
+        addCars(step.dropCars(), targetTrack.trains());
+    }
+
+    void removeCars(List<String> carIds, TrackTrains<TrainState> tt) {
+        for (var car : carIds.reversed()) {
+            removeCar(car, tt.trains());
+        }
+    }
+
+    void removeCar(String carId, List<TrainState> trains) {
+        var lastTrain = trains.getLast();
+        removeCar(carId, lastTrain);
+        if (lastTrain.carIds().isEmpty()) {
+            trains.removeLast();
+        }
     }
 
     void removeCar(String carId, TrainState t) {
@@ -24,28 +58,17 @@ public class Simulator {
         t.carIds().removeLast();
     }
 
-    void removeCar(String carId, TrackTrains<TrainState> tt) {
-        var lastTrain = tt.trains().getLast();
-        removeCar(carId, lastTrain);
-        if (lastTrain.carIds().isEmpty()) {
-            tt.trains().removeLast();
+    void addCars(List<List<String>> packets, List<TrainState> trains) {
+        if (trains.getLast().carIds().getLast().equals(packets.getLast().getLast())) {
+            // remove the duplicated car
+            packets.getLast().removeLast();
+            // add the first packet to the last train
+            trains.getLast().carIds().addAll(packets.getLast().reversed());
+            packets.removeLast();
         }
-    }
-
-    void removeCars(List<String> carIds, TrackTrains<TrainState> tt) {
-        for (var car : carIds.reversed()) {
-            removeCar(car, tt);
+        // add all other packets as separate trains
+        for (var p: packets.reversed()) {
+            trains.add(new TrainState(p.reversed()));
         }
-    }
-
-    private void addCars(List<List<String>> packets, TrackTrains<TrainState> tt) {
-        //if (tt.trains().getLast().cars().getLast().equals())
-    }
-
-    void processStep(ShuntingStep step) {
-        var originTrack = currentState.get(step.fromTrack());
-        removeCars(step.pickCars(), originTrack);
-        var targetTrack = currentState.get(step.toTrack());
-        addCars(step.dropCars(), targetTrack);
     }
 }

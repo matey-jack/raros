@@ -14,7 +14,7 @@ public class Validator {
         Note that target-track-ids and given-track-ids might overlap, since car packets will only be placed on target tracks
         when all of them are complete, thus given tracks are empty.
      */
-    List<String> validateTask(Tracks<TrainState> given, Tracks<TrainRequest> target, List<String> availableTracks) {
+    public List<String> validateTask(Tracks<TrainState> given, Tracks<TrainRequest> target, List<String> availableTracks) {
         List<String> result = new ArrayList<>();
         var givenCarIds = getAllCarIds(given);
         checkForDuplicates(givenCarIds, "given", result);
@@ -93,5 +93,55 @@ public class Validator {
                     targetPackets + " tracks are needed to form the target car packets, but only " +
                     availableTracks.size() + " tracks are available in the infrastructure.");
         }
+    }
+
+    public List<String> checkResult(Tracks<TrainState> state, Tracks<TrainRequest> target) {
+        List<String> report = new ArrayList<>();
+        // TODO: check that keySet are the same
+        for (var track : target.tracks().keySet()) {
+            checkTrack(track, state.tracks().get(track).trains(), target.tracks().get(track).trains(), report);
+        }
+        return report;
+    }
+
+    private void checkTrack(String track, List<TrainState> trains, List<TrainRequest> requests, List<String> report) {
+        if (trains.size() != requests.size()) {
+            report.add(
+                    "Track " + track + " has " + trains.size() + " trains, " +
+                            "but should have " + requests.size() + ".");
+        }
+        for (var i = 0; i < trains.size(); i++) {
+            checkTrain(track, i, trains.get(i), requests.get(i), report);
+        }
+    }
+
+    private void checkTrain(String track, int trainNumber, TrainState train, TrainRequest request, List<String> report) {
+        var targetSize = request.carPackets().stream().mapToInt(List::size).sum();
+        if (train.carIds().size() != targetSize) {
+            report.add(
+                    "Train " + trainNumber + " on track " + track + ":" +
+                            " expected " + targetSize + " cars, but only got " + train.carIds().size() + ".");
+        }
+        var statePackets = packetize(train.carIds(), request.carPackets());
+        for (var i = 0; i < statePackets.size(); i++) {
+            var actualCars = statePackets.get(i);
+            var expectedCars = request.carPackets().get(i);
+            if (!actualCars.equals(expectedCars)) {
+                report.add(
+                        "Car packet " + i + " of train " + trainNumber + " on track " + track + " has wrong car(s): " +
+                                "[" + String.join(", ", actualCars) + "] vs [" + String.join(", ", expectedCars) + "]."
+                );
+            }
+        }
+    }
+
+    private List<List<String>> packetize(List<String> carIds, List<List<String>> expPackets) {
+        var result = new ArrayList<List<String>>();
+        var packetStart = 0;
+        for (var p : expPackets) {
+            result.add(carIds.subList(packetStart, packetStart + p.size()));
+            packetStart += p.size();
+        }
+        return result;
     }
 }
