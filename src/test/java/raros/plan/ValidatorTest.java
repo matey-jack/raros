@@ -13,15 +13,15 @@ class ValidatorTest {
 
     @Test
     void testValidateTask() {
-        var given = serde.<Tracks<TrainState>>read("src/test/resources/example-given-state.json");
-        var target = serde.<Tracks<TrainRequest>>read("src/test/resources/example-target-state.json");
+        var given = serde.read("src/test/resources/example-given-state.json", Tracks.class);
+        var target = serde.read("src/test/resources/example-target-state.json", Tracks.class);
         var result = validator.validateTask(given, target, infraTracks);
         assertThat(result).isEmpty();
     }
 
     @Test
     void testValidatePlan() {
-        var plan = serde.<ShuntingPlan>read("src/test/resources/example-shunting-plan.json");
+        var plan = serde.read("src/test/resources/example-shunting-plan.json", ShuntingPlan.class);
         var result = validator.validatePlan(plan, infraTracks);
         assertThat(result).isEmpty();
     }

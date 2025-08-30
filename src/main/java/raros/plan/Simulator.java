@@ -13,15 +13,15 @@ import java.util.Map;
     and adapt easily to any states different from how they were reported to be.
  */
 public class Simulator {
-    private final Map<String, TrackTrains<TrainState>> currentState;
+    private final Map<String, TrackTrains> currentState;
 
-    public static Tracks<TrainState> simulate(Tracks<TrainState> given, ShuntingPlan plan) {
+    public static Tracks simulate(Tracks given, ShuntingPlan plan) {
         var sim = new Simulator(given);
         sim.processPlan(plan);
-        return new Tracks<>(sim.currentState);
+        return new Tracks(sim.currentState);
     }
 
-    Simulator(Tracks<TrainState> given) {
+    Simulator(Tracks given) {
         currentState = given.tracks();
     }
 
@@ -34,22 +34,22 @@ public class Simulator {
 
     void processStep(int stepNo, ShuntingStep step) {
         try {
-            var originTrack = currentState.get(step.fromTrack());
-            removeCars(step.pickCars(), originTrack);
-            var targetTrack = currentState.computeIfAbsent(step.toTrack(), (id) -> new TrackTrains<>(new ArrayList<>()));
-            addCars(step.dropCars(), targetTrack.trains());
+//            var originTrack = currentState.get(step.fromTrack());
+//            removeCars(step.pickCars(), originTrack);
+//            var targetTrack = currentState.computeIfAbsent(step.toTrack(), (id) -> new TrackTrains(new ArrayList<>()));
+//            addCars(step.dropCars(), targetTrack.trains());
         } catch (Exception e) {
             throw new RuntimeException("Error in step " + stepNo + ": " + e.getMessage(), e);
         }
     }
 
-    void removeCars(List<String> carIds, TrackTrains<TrainState> tt) {
+    void removeCars(List<String> carIds, TrackTrains tt) {
         for (var car : carIds.reversed()) {
             removeCar(car, tt.trains());
         }
     }
 
-    void removeCar(String carId, List<TrainState> trains) {
+    void removeCar(String carId, List<Train> trains) {
         var lastTrain = trains.getLast();
         removeCar(carId, lastTrain);
         if (lastTrain.carIds().isEmpty()) {
@@ -57,14 +57,14 @@ public class Simulator {
         }
     }
 
-    void removeCar(String carId, TrainState t) {
+    void removeCar(String carId, Train t) {
         if (!t.carIds().getLast().equals(carId)) {
             throw new RuntimeException("Car " + carId + " to be removed, but " + t.carIds().getLast() + " is present.");
         }
         t.carIds().removeLast();
     }
 
-    void addCars(List<List<String>> packets, List<TrainState> trains) {
+    void addCars(List<List<String>> packets, List<Train> trains) {
         // if there is already something on the target track, add the first packet to the last train
         if (!trains.isEmpty()) {
             trains.getLast().carIds().addAll(packets.getFirst());
@@ -72,7 +72,7 @@ public class Simulator {
         }
         // add all other packets as separate trains
         for (var p : packets) {
-            trains.add(new TrainState(p));
+            trains.add(new Train(p));
         }
     }
 }

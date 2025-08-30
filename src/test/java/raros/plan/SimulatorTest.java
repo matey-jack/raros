@@ -9,9 +9,9 @@ class SimulatorTest {
 
     @Test
     void test() {
-        var given = serde.<Tracks<TrainState>>read("src/test/resources/example-given-state.json");
-        var target = serde.<Tracks<TrainRequest>>read("src/test/resources/example-target-state.json");
-        var plan = serde.<ShuntingPlan>read("src/test/resources/example-shunting-plan.json");
+        var given = serde.read("src/test/resources/example-given-state.json", Tracks.class);
+        var target = serde.read("src/test/resources/example-target-state.json", Tracks.class);
+        var plan = serde.read("src/test/resources/example-shunting-plan.json", ShuntingPlan.class);
         var result = Simulator.simulate(given, plan);
 
         var report = new Validator().checkResult(result, target);

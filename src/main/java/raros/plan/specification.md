@@ -12,19 +12,18 @@ Alternativ können die Zentimeter-genauen Positionen der Wagen noch in einem sep
 aber eigentlich braucht man doch sowieso den Annäherungssensor bzw. eine Kamera.
 
 Um den Aufwand beim Rangieren zu beschränken, sollte die Reihenfolge der Wagen im Ergebnis nicht zu stark beschränkt sein.
-Wir schlagen daher als Datenmodell vor, dass der Soll-Zustand der zu erstellenden Züge durch "Wagenpakete" beschrieben wird.
-Alle Wagen eines Pakets hängen ununterbrochen zusammen, innerhalb des Pakets jedoch ist die Reihenfolge frei.
-So kann der Zug am Zwischenbahnhof leicht getrennt werden.
+Wir erreichen das, indem eine Zugbeschreibung generell nur als "Menge von Wägen" interpretiert wird, deren Reihenfolge nicht relevant ist. Damit innerhalb eines Gleises trotzdem noch eine Reihenfolge erzeugt werden kann, erlauben wir im Datenmodell,
+dass auf einem Gleis mehrere Züge stehen können, deren Reihenfolge wiederum relevant ist. 
+So kann ein Zug aus mehreren Teilzügen zusammengestellt werden, welche kurz vor Abfahrt zusammengekuppelt werden.
 (Diese Funktion erspart sehr viel Rangierzeit, Software-technisch sind die Auswirkungen jedoch auf den Plan-Teil der Anwendung beschränkt.)
-
-Dieses Datenmodell ist sehr flexibel: ein Zug ohne definierte Wagenreihenfolge lässt sich durch ein einziges Wagenpaket abbilden
-und ein Zug mit vollständig fest definierter Wagenreihenfolge lässt sich durch ein-Wagen-Pakete abbilden.
 
 Soll- und Ist-Datenformat sind technisch gleich, aber mit unterschiedlicher Bedeutung:
 Im Ist-Zustand ist ja die genaue Position aller Wagen bekannt (und wird auch benötigt),
-daher ist die Reihenfolge der Elemente in einem Paket relevant (Interpretation als geordnete Liste),
+daher ist die Reihenfolge der Wagen im Zug relevant (Interpretation als geordnete Liste),
 während sie im Soll-Zustand nicht relevant ist (Interpretation der Liste als Menge).
-Als Konvention verwenden wir in der Ist-Beschreibung nur ein Paket pro Zug.
+
+Aktuell verlangt unsere Spezifikation, dass ein Soll-Zustand alle Wagen erwähnen muss, die auch im Ist-Zustand vorkommen.
+Das heißt, es sollen keine Wagen mit undefinierter Position zurückbleiben. Diese Restriktion könnte man später noch aufheben. 
 
 Für die genaue Beschreibung siehe die Java-records "Envelope" und dort verwendete, sowie die Beispiele in src/test/resources.
 
@@ -63,18 +62,16 @@ dann kann es passieren, dass zur Herstellung des Zielzustands Wägen mehrmals be
 Auch wird der Planungsalgorithmus dadurch sehr kompliziert. 
 
 Damit der ganze Prozess überschaubar bleibt, schlage ich Folgendes vor:
-- es muss für jedes Wagen-Paket im SOLL-Zustand schon im IST-Zustand ein freies Gleis vorliegen. D.h. alle Ziel-Gleise müssen frei sein und zusätzlich ein weiteres freies Gleis für jedes Wagenpaket über dem ersten pro Zielgleis!
-- unter diesen Umständen hat ein Rangier-Plan immer dieselbe Form und jeder Wagen wird höchstens zwei Mal bewegt:
-   * einmal auf das Gleis seines Wagen-Pakets
-   * und dann dieses ganze Paket auf's Zielgleis
+- Es muss für jeden Zug im SOLL-Zustand schon im IST-Zustand ein freies Gleis vorliegen. D.h. alle Ziel-Gleise müssen frei sein und zusätzlich ein weiteres freies Gleis für jeden Zug über dem ersten pro Zielgleis!
+- Unter diesen Umständen hat ein Rangier-Plan immer dieselbe Form und jeder Wagen wird höchstens zwei Mal bewegt:
+   * einmal auf das Gleis seines Zugs,
+   * und am Ende die Züge (außer dem ersten, der sich schon dort befindet) aufs Zielgleis.
 
 
 ((
-Randbemerkung dazu: Am einfachsten ist das Rangieren, wenn alle Zielgleise schon leer sind und es zusätzlich ein freies Gleis zum Zwischenparken gibt, denn dann kann man alle Wagen direkt von ihrer Position schieben, oder erst auf's Zwischengleis, wenn die Reihenfolge auf den Zielgleisen eingeschränkt ist. Bei starker Einschränkung der Reihenfolge kann danach noch die nun frei gewordenen Start-gleise benutzen, um einzelne Teilpakete zu gruppieren. Im schlimmsten Fall hat man aber nur ein Gleis jeder Sorte und eine fest-definierte Reihenfolge im Zielgleis, was dann zu sehr viel Hin- und Her-Fahren führt.
-
-Noch schlimmer wird das Ganze, wenn die Ziel-Gleise am Anfang gar nicht alle frei sind. 
-Man kann zwar dann versuchen, sie freizuräumen, indem man Wagen auf andere Startgleise verteilt, 
-aber muss dann ja eigentlich auch maximale Gleislänge berücksichtigen, was alles komplizierter macht.
+Randbemerkung dazu: wenn die Ziel-Gleise am Anfang gar nicht alle frei sind, kann man denselben Algorithmus anwenden,
+nachdem man sie frei geräumt hat, indem man Wagen auf andere Startgleise verteilt. 
+Aber man muss dann die maximale Gleislänge berücksichtigen, was alles komplizierter macht.
 
 Besonders fies wird es, wenn die Wage ursprünglich schon in sehr ähnlicher Position zur Zielposition stehen, 
 denn dann sind die Rangier-Schritte eher die Lösung eines Logikrätsels als Abarbeitung eines Algorithmus.
