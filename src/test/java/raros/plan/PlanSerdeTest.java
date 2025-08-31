@@ -2,6 +2,7 @@ package raros.plan;
 
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PlanSerdeTest {
@@ -13,7 +14,7 @@ class PlanSerdeTest {
         var result = serde.read(filePath, Tracks.class).tracks();
 
         assertNotNull(result, "Result should not be null");
-        assertEquals(2, result.size(), "Should have 2 tracks");
+        assertEquals(5, result.size(), "Should have 5 tracks");
 
         // Check track 45
         assertTrue(result.containsKey("45"), "Should contain track 45");
@@ -31,7 +32,7 @@ class PlanSerdeTest {
     @Test
     void testReadTargetState() {
         String filePath = "src/test/resources/example-target-state.json";
-        var result = serde.read(filePath, Tracks.class).tracks();
+        var result = serde.read(filePath, ShuntingTask.class).targetTracks();
         assertTrue(result.containsKey("41"));
         assertTrue(result.containsKey("42"));
         // TODO: check correct reading of car packets
@@ -40,6 +41,11 @@ class PlanSerdeTest {
     @Test
     void readPlan() {
         var result = serde.read("src/test/resources/example-shunting-plan.json", ShuntingPlan.class);
-        assertEquals(9, result.steps().size());
+        assertThat(result.steps().getFirst()).isInstanceOf(Pick.class);
+        assertThat(result.steps().get(1)).isInstanceOf(Drop.class);
+        Drop coupledDrop = (Drop) result.steps().get(5);
+        assertThat(coupledDrop.couple()).isTrue();
+
+        assertEquals(13, result.steps().size());
     }
 }

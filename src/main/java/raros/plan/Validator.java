@@ -8,30 +8,37 @@ public class Validator {
         Return a set of validation errors. Empty set means everything is valid.
 
         1. Check the uniqueness and completeness of car IDs.
+            Optional: we could allow car IDs not to be mentioned in the target state
+            as long as their number does not exceed the capacity of tracks not used in the target state.
 
-        2. Check that there is one free track for each car packet in the target state.
+        2. Target state has at most maxWagonsPerTrack on each track.
 
-        Note that target-track-ids and given-track-ids might overlap, since car packets will only be placed on target tracks
-        when all of them are complete, thus given tracks are empty.
+        3. Target state has at most one train per track.
+
+        4. Total number of wagons doesn't exceed (numTracks-1)*maxWagonsPerTrack.
      */
-    public List<String> validateTask(Tracks given, Tracks target, List<String> availableTracks) {
+    public List<String> validateTask(Tracks given, ShuntingTask task, List<String> availableTracks) {
         List<String> result = new ArrayList<>();
-        var givenCarIds = getAllCarIds(given);
+        Map<String, TrackTrains> givenTracks = given.tracks();
+        var givenCarIds = getAllCarIds(givenTracks);
         checkForDuplicates(givenCarIds, "given", result);
-        var targetCarIds = getAllCarIds(target);
+        Map<String, TrackTrains> targetTracks = task.targetTracks();
+        var targetCarIds = getAllCarIds(targetTracks);
         checkForDuplicates(targetCarIds, "target", result);
         checkForMissingCars(givenCarIds, targetCarIds, "given", result);
         checkForMissingCars(targetCarIds, givenCarIds, "target", result);
-        checkTracksExist(given, "given", availableTracks, result);
-        checkTracksExist(target, "target", availableTracks, result);
-        checkTrackAvailability(given, target, availableTracks, result);
-        // TODO: also check for empty trains and carPackets (which should not exist)
+        checkTracksExist(givenTracks.keySet(), "given", availableTracks, result);
+        checkTracksExist(targetTracks.keySet(), "target", availableTracks, result);
+        checkTrackCapacity(givenTracks, "given", task.maxWagonsPerTrack(), result);
+        checkTrackCapacity(targetTracks, "target", task.maxWagonsPerTrack(), result);
+        oneTrainPerTrack(targetTracks, result);
+        checkSpareCapacity(task, givenCarIds.size(), result);
         return result;
     }
 
-    static List<String> getAllCarIds(Tracks t) {
+    static List<String> getAllCarIds(Map<String, TrackTrains> tracks) {
         var result = new ArrayList<String>();
-        for (var track : t.tracks().values()) {
+        for (var track : tracks.values()) {
             for (var train : track.trains()) {
                 result.addAll(train.carIds());
             }
@@ -73,8 +80,8 @@ public class Validator {
         }
     }
 
-    static <T extends Train> void checkTracksExist(Tracks yard, String label, List<String> availableTracks, List<String> results) {
-        var invalidTracks = yard.tracks().keySet();
+    static <T extends Train> void checkTracksExist(Set<String> trackIds, String label, List<String> availableTracks, List<String> results) {
+        var invalidTracks = new HashSet<>(trackIds);
         invalidTracks.removeAll(availableTracks);
         if (!invalidTracks.isEmpty()) {
             results.add(
@@ -83,15 +90,29 @@ public class Validator {
         }
     }
 
-    static void checkTrackAvailability(Tracks given, Tracks target, List<String> availableTracks, List<String> result) {
-        var givenTracks = given.tracks().keySet();
-        var targetPackets = target.tracks().values().stream()
-                .mapToInt((t) -> t.trains().size())
-                .sum();
-        if (givenTracks.size() + targetPackets > availableTracks.size()) {
-            result.add(givenTracks.size() + " tracks are occupied at beginning, and " +
-                    targetPackets + " tracks are needed to form the target car packets, but only " +
-                    availableTracks.size() + " tracks are available in the infrastructure.");
+    private void checkTrackCapacity(Map<String, TrackTrains> givenTracks, String label, int capacity, List<String> result) {
+        for (var track : givenTracks.entrySet()) {
+            int numCars = track.getValue().size();
+            if (numCars > capacity) {
+                result.add(label + " track " + track.getKey() + " has " + numCars + " cars, but only " + capacity + " are allowed.");
+            }
+        }
+    }
+
+    private void oneTrainPerTrack(Map<String, TrackTrains> targetTracks, List<String> result) {
+        for (var track : targetTracks.entrySet()) {
+            if (track.getValue().trains().size() > 1) {
+                result.add("Track " + track.getKey() + " has more than one train.");
+            }
+        }
+    }
+
+    private void checkSpareCapacity(ShuntingTask task, int numWagons, List<String> result) {
+        var numTracks = task.targetTracks().size();
+        var capacity = (numTracks - 1) * task.maxWagonsPerTrack();
+        if (numWagons > capacity) {
+            result.add("There are " + numWagons + " wagons to be shunted, " +
+                    "which is above the capacity of " + capacity + " wagons, given " + numTracks + " tracks.");
         }
     }
 

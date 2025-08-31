@@ -2,7 +2,19 @@
   "datatype": "yard-tracks-car-order/target",
   "version": "beta-1",
   "payload": {
-    "tracks": {
+    "maxWagonsPerTrack": 8,
+    "targetTracks": {
+      "41": {
+        "trains": [
+          {
+            "carIds": [
+              "012",
+              "004",
+              "003"
+            ]
+          }
+        ]
+      },
       "42": {
         "trains": [
           {
@@ -11,29 +23,28 @@
               "011",
               "001"
             ]
-          },
-          {
-          "carIds": [
-                "002",
-                "005"
-              ]
           }
         ]
       },
-      "41": {
+      "43": {
+        "trains": []
+      },
+      "44": {
         "trains": [
           {
-            "carIds":
-              [
-                "012",
-                "004",
-                "003"
-              ]
-          },
+            "carIds": [
+              "002",
+              "005"
+            ]
+          }
+        ]
+      },
+      "45": {
+        "trains": [
           {
             "carIds": [
-                "008",
-                "009"
+              "008",
+              "009"
             ]
           }
         ]

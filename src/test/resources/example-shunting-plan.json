@@ -4,58 +4,110 @@
   "payload": {
     "steps": [
       {
-        "fromTrack": "45",
-        "toTrack": "43",
-        "pickCars": ["005"],
-        "dropCars": [["005"]]
+        "type": "PICK",
+        "track": "45",
+        "cars": [
+          "003",
+          "004",
+          "005"
+        ]
       },
       {
-        "fromTrack": "45",
-        "toTrack": "41",
-        "pickCars": ["003", "004"],
-        "dropCars": [["003", "004"]]
+        "type": "DROP",
+        "track": "41",
+        "cars": [
+          "003",
+          "004"
+        ]
       },
       {
-        "fromTrack": "45",
-        "toTrack": "43",
-        "pickCars": ["002"],
-        "dropCars": [["002"]]
+        "type": "DROP",
+        "track": "43",
+        "cars": [
+          "005"
+        ]
       },
       {
-        "fromTrack": "45",
-        "toTrack": "42",
-        "pickCars": ["001"],
-        "dropCars": [["001"]]
+        "type": "PICK",
+        "track": "45",
+        "cars": [
+          "001",
+          "002"
+        ]
       },
       {
-        "fromTrack": "44",
-        "toTrack": "41",
-        "pickCars": ["012"],
-        "dropCars": [["012"]]
+        "type": "DROP",
+        "track": "42",
+        "cars": [
+          "001"
+        ]
       },
       {
-        "fromTrack": "44",
-        "toTrack": "42",
-        "pickCars": ["011"],
-        "dropCars": [["011"]]
+        "type": "DROP",
+        "track": "43",
+        "cars": [
+          "002"
+        ],
+        "couple": true
       },
       {
-        "fromTrack": "44",
-        "toTrack": "42",
-        "pickCars": ["010"],
-        "dropCars": [["010"]]
+        "type": "PICK",
+        "track": "44",
+        "cars": [
+          "008",
+          "009",
+          "010",
+          "011",
+          "012"
+        ]
       },
       {
-        "fromTrack": "44",
-        "toTrack": "41",
-        "pickCars": ["008", "009"],
-        "dropCars": [[], ["008", "009"]]
+        "type": "PICK",
+        "track": "44",
+        "cars": [
+          "008",
+          "009"
+        ]
       },
       {
-        "fromTrack": "43",
-        "toTrack": "42",
-        "pickCars": ["005", "002"],
-        "dropCars": [["005", "002"]]
+        "type": "DROP",
+        "track": "42",
+        "cars": [
+          "010",
+          "011"
+        ],
+        "couple": true
+      },
+      {
+        "type": "DROP",
+        "track": "41",
+        "cars": [
+          "012"
+        ]
+      },
+      {
+        "type": "DROP",
+        "track": "41",
+        "cars": [
+          "008",
+          "009"
+        ]
+      },
+      {
+        "type": "PICK",
+        "track": "43",
+        "cars": [
+          "005",
+          "002"
+        ]
+      },
+      {
+        "type": "DROP",
+        "track": "42",
+        "cars": [
+          "005",
+          "002"
+        ]
       }
     ]
   }

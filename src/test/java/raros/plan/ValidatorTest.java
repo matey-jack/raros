@@ -14,7 +14,7 @@ class ValidatorTest {
     @Test
     void testValidateTask() {
         var given = serde.read("src/test/resources/example-given-state.json", Tracks.class);
-        var target = serde.read("src/test/resources/example-target-state.json", Tracks.class);
+        var target = serde.read("src/test/resources/example-target-state.json", ShuntingTask.class);
         var result = validator.validateTask(given, target, infraTracks);
         assertThat(result).isEmpty();
     }

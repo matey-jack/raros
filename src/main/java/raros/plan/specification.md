@@ -52,6 +52,10 @@ Für den Rbl. ist wichtig,
 
 Für die genaue Beschreibung siehe Source Code und Beispiele in src/test/resources.
 
+TODO: Kuppeln von Wagen auf dem Zielgleis:
+ - Kuppeln des ersten Wagens an einen vorhandenen Wagen durch Bool'schen Wert anzeigen.
+ - Entkuppeln von Wagen, die gemeinsam gebracht werden, anzeigen durch wiederholte Schritte vom Typ DROP.
+
 c – Beschränkung der Funktionalität
 -----------------------------------
 
@@ -62,18 +66,25 @@ dann kann es passieren, dass zur Herstellung des Zielzustands Wägen mehrmals be
 Auch wird der Planungsalgorithmus dadurch sehr kompliziert. 
 
 Damit der ganze Prozess überschaubar bleibt, schlage ich Folgendes vor:
-- Es muss für jeden Zug im SOLL-Zustand schon im IST-Zustand ein freies Gleis vorliegen. D.h. alle Ziel-Gleise müssen frei sein und zusätzlich ein weiteres freies Gleis für jeden Zug über dem ersten pro Zielgleis!
-- Unter diesen Umständen hat ein Rangier-Plan immer dieselbe Form und jeder Wagen wird höchstens zwei Mal bewegt:
-   * einmal auf das Gleis seines Zugs,
-   * und am Ende die Züge (außer dem ersten, der sich schon dort befindet) aufs Zielgleis.
+- Der SOLL-Zustand kann pro Gleis nur einen Zug vorsehen. Innerhalb jedes Zuges im SOLL-Zustand ist die Reihenfolge der Wagen irrelevant. (Die sich ergebende Reihenfolge wird aber im Ergebnis zurück gemeldet.) Nennen wir die Anzahl der Gleise G.
+- Die maximale Anzahl von Wagen auf einem Gleis ist für alle Gleise gleich. Nennen wir die Anzahl der Wagen pro Gleis WG.
+- Auf dem Ausziehgleis haben auch WG Wagen plus Lokomotive und Sicherheitsabstand zu Weichen Platz.
+- Die Anzahl von insgesamt Wagen vorhandenen Wagen ist beschränkt, sodass mindestens ein Gleis völlig frei sein kann. Nennen wir die gesamte Anzahl der Wagen WW, dann soll also WW ≤ (G-1) × WG sein. 
 
 
-((
-Randbemerkung dazu: wenn die Ziel-Gleise am Anfang gar nicht alle frei sind, kann man denselben Algorithmus anwenden,
-nachdem man sie frei geräumt hat, indem man Wagen auf andere Startgleise verteilt. 
-Aber man muss dann die maximale Gleislänge berücksichtigen, was alles komplizierter macht.
+d - Algorithmus
+===============
 
-Besonders fies wird es, wenn die Wage ursprünglich schon in sehr ähnlicher Position zur Zielposition stehen, 
-denn dann sind die Rangier-Schritte eher die Lösung eines Logikrätsels als Abarbeitung eines Algorithmus.
-))
+1. Räume so viele Ziel-Gleise wie möglich frei, indem Wagen von dort auf anderen Gleisen zusammen gefasst werden.
+    - Falls einige Gleise keine Ziel-Gleise sind, werden Wagen dort bevorzugt hingefahren.
+    - Alle Gleise, auf denen die Wagen dann stehen, nennen wir "Arbeitsgleise".
+    - Am Ende des Prozesses bleiben WG Wagen an der Lok hängen und können direkt im nächsten Schritt verwendet werden.
+    - Wenn alle Zielgleise jetzt schon leer sind, springe direkt zu Schritt 3.
+   
+2. Verteile Wagen auf die bisher freien Zielgleise. 
+   - Ziehe dazu aus den Arbeitsgleisen Teilzüge, an deren freiem Ende sich Wagen befinden, die auf die bisher freien Zielgleise sollen. Wagen, deren Zielgleis noch nicht frei ist, bleiben dabei an der Lok.
+   - Räume dabei zunächst die anderen Zielgleise bevorzugt frei. Dass heißt, sobald die gesamte Anzahl der Wagen auf ein Gleis weniger passt, fasse sie dort zusammen. 
+
+3. Wenn alle Zielgleise frei sind (dass heißt, nur noch Wagen, die dort sein SOLLen, sind auch dort), kann die Verteilung schneller erfolgen:
+    - Alle Wagen werden gesamt aus einem Arbeitsgleis gezogen und die jeweils vorderen auf das richtige Zielgleis abgesetzt.
 
