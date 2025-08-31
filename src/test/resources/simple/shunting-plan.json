@@ -62,12 +62,13 @@
         ]
       },
       {
-        "type": "PICK",
-        "track": "44",
+        "type": "DROP",
+        "track": "43",
         "cars": [
           "008",
           "009"
-        ]
+        ],
+        "couple": true
       },
       {
         "type": "DROP",
@@ -83,31 +84,8 @@
         "track": "41",
         "cars": [
           "012"
-        ]
-      },
-      {
-        "type": "DROP",
-        "track": "41",
-        "cars": [
-          "008",
-          "009"
-        ]
-      },
-      {
-        "type": "PICK",
-        "track": "43",
-        "cars": [
-          "005",
-          "002"
-        ]
-      },
-      {
-        "type": "DROP",
-        "track": "42",
-        "cars": [
-          "005",
-          "002"
-        ]
+        ],
+        "couple": true
       }
     ]
   }

@@ -1,0 +1,106 @@
+{
+  "datatype": "raros-shunting-plan",
+  "version": "beta-1",
+  "payload": {
+    "steps": [
+      {
+        "type": "PICK",
+        "track": "45",
+        "cars": [
+          "003",
+          "004",
+          "005"
+        ]
+      },
+      {
+        "type": "DROP",
+        "track": "41",
+        "cars": [
+          "003",
+          "004"
+        ]
+      },
+      {
+        "type": "DROP",
+        "track": "43",
+        "cars": [
+          "005"
+        ]
+      },
+      {
+        "type": "PICK",
+        "track": "45",
+        "cars": [
+          "001",
+          "002"
+        ]
+      },
+      {
+        "type": "DROP",
+        "track": "42",
+        "cars": [
+          "001"
+        ]
+      },
+      {
+        "type": "DROP",
+        "track": "43",
+        "cars": [
+          "002"
+        ],
+        "couple": true
+      },
+      {
+        "type": "PICK",
+        "track": "44",
+        "cars": [
+          "008",
+          "009",
+          "010",
+          "011",
+          "012"
+        ]
+      },
+      {
+        "type": "DROP",
+        "track": "41",
+        "cars": [
+          "008",
+          "009"
+        ]
+      },
+     {
+        "type": "DROP",
+        "track": "42",
+        "cars": [
+          "010",
+          "011"
+        ],
+        "couple": true
+      },
+      {
+        "type": "DROP",
+        "track": "41",
+        "cars": [
+          "012"
+        ]
+      },
+      {
+        "type": "PICK",
+        "track": "43",
+        "cars": [
+          "005",
+          "002"
+        ]
+      },
+      {
+        "type": "DROP",
+        "track": "44",
+        "cars": [
+          "005",
+          "002"
+        ]
+      }
+    ]
+  }
+}

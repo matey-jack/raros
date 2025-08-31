@@ -1,5 +1,6 @@
 package raros.plan;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public record Train(
@@ -10,5 +11,9 @@ public record Train(
 ) {
     public int size() {
         return carIds.size();
+    }
+
+    public Train() {
+        this(new ArrayList<>());
     }
 }

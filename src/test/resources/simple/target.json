@@ -1,0 +1,49 @@
+{
+  "datatype": "yard-tracks-car-order/target",
+  "version": "beta-1",
+  "payload": {
+    "maxWagonsPerTrack": 8,
+    "targetTracks": {
+      "41": {
+        "trains": [
+          {
+            "carIds": [
+              "012",
+              "004",
+              "003"
+            ]
+          }
+        ]
+      },
+      "42": {
+        "trains": [
+          {
+            "carIds": [
+              "010",
+              "011",
+              "001"
+            ]
+          }
+        ]
+      },
+      "43": {
+        "trains": [
+          {
+            "carIds": [
+              "008",
+              "009",
+              "002",
+              "005"
+            ]
+          }
+        ]
+      },
+      "44": {
+        "trains": []
+      },
+      "45": {
+        "trains": []
+      }
+    }
+  }
+}

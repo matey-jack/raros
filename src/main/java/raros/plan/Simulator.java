@@ -13,16 +13,17 @@ import java.util.Map;
     and adapt easily to any states different from how they were reported to be.
  */
 public class Simulator {
-    private final Map<String, TrackTrains> currentState;
+    private final Map<String, TrackTrains> currentTracks;
+    private final List<String> carsOnLocomotive = new ArrayList<>();
 
     public static Tracks simulate(Tracks given, ShuntingPlan plan) {
         var sim = new Simulator(given);
         sim.processPlan(plan);
-        return new Tracks(sim.currentState);
+        return new Tracks(sim.currentTracks);
     }
 
     Simulator(Tracks given) {
-        currentState = given.tracks();
+        currentTracks = given.tracks();
     }
 
     private void processPlan(ShuntingPlan plan) {
@@ -33,20 +34,32 @@ public class Simulator {
     }
 
     void processStep(int stepNo, ShuntingStep step) {
+        List<Train> trackTrains = currentTracks.get(step.track()).trains();
         try {
-//            var originTrack = currentState.get(step.fromTrack());
-//            removeCars(step.pickCars(), originTrack);
-//            var targetTrack = currentState.computeIfAbsent(step.toTrack(), (id) -> new TrackTrains(new ArrayList<>()));
-//            addCars(step.dropCars(), targetTrack.trains());
+            if (step instanceof Pick) {
+                for (var car : step.cars().reversed()) {
+                    removeCar(car, trackTrains);
+                    carsOnLocomotive.add(car);
+                }
+            } else if (step instanceof Drop) {
+                for (var car : step.cars()) {
+                    removeFromLocomotive(car);
+                }
+                if (!((Drop) step).couple()) {
+                    trackTrains.add(new Train());
+                }
+                trackTrains.getLast().carIds().addAll(step.cars());
+            }
         } catch (Exception e) {
             throw new RuntimeException("Error in step " + stepNo + ": " + e.getMessage(), e);
         }
     }
 
-    void removeCars(List<String> carIds, TrackTrains tt) {
-        for (var car : carIds.reversed()) {
-            removeCar(car, tt.trains());
+    private void removeFromLocomotive(String carId) {
+        if (!carsOnLocomotive.getLast().equals(carId)) {
+            throw new RuntimeException("Car " + carId + " to be removed, but " + carsOnLocomotive.getLast() + " is present.");
         }
+        carsOnLocomotive.removeLast();
     }
 
     void removeCar(String carId, List<Train> trains) {
@@ -58,8 +71,9 @@ public class Simulator {
     }
 
     void removeCar(String carId, Train t) {
-        if (!t.carIds().getLast().equals(carId)) {
-            throw new RuntimeException("Car " + carId + " to be removed, but " + t.carIds().getLast() + " is present.");
+        String lastCarId = t.carIds().getLast();
+        if (!lastCarId.equals(carId)) {
+            throw new RuntimeException("Car " + carId + " to be removed, but " + lastCarId + " is present.");
         }
         t.carIds().removeLast();
     }

@@ -10,7 +10,7 @@ class PlanSerdeTest {
 
     @Test
     void testReadGivenState() {
-        String filePath = "src/test/resources/example-given-state.json";
+        String filePath = "src/test/resources/simple/given.json";
         var result = serde.read(filePath, Tracks.class).tracks();
 
         assertNotNull(result, "Result should not be null");
@@ -31,21 +31,21 @@ class PlanSerdeTest {
 
     @Test
     void testReadTargetState() {
-        String filePath = "src/test/resources/example-target-state.json";
+        String filePath = "src/test/resources/simple/target.json";
         var result = serde.read(filePath, ShuntingTask.class).targetTracks();
         assertTrue(result.containsKey("41"));
         assertTrue(result.containsKey("42"));
-        // TODO: check correct reading of car packets
+        // TODO: check correct reading of trains
     }
 
     @Test
     void readPlan() {
-        var result = serde.read("src/test/resources/example-shunting-plan.json", ShuntingPlan.class);
+        var result = serde.read("src/test/resources/simple/shunting-plan.json", ShuntingPlan.class);
         assertThat(result.steps().getFirst()).isInstanceOf(Pick.class);
         assertThat(result.steps().get(1)).isInstanceOf(Drop.class);
         Drop coupledDrop = (Drop) result.steps().get(5);
         assertThat(coupledDrop.couple()).isTrue();
 
-        assertEquals(13, result.steps().size());
+        assertEquals(10, result.steps().size());
     }
 }

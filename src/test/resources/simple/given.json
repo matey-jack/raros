@@ -1,0 +1,47 @@
+{
+  "datatype": "yard-tracks-car-order/given",
+  "version": "beta-1",
+  "payload": {
+    "tracks": {
+      "41": {
+        "trains": []
+      },
+      "42": {
+        "trains": []
+      },
+      "43": {
+        "trains": []
+      },
+      "44": {
+        "trains": [
+          {
+            "carIds": [
+              "008",
+              "009",
+              "010",
+              "011",
+              "012"
+            ]
+          }
+        ]
+      },
+      "45": {
+        "trains": [
+          {
+            "carIds": [
+              "001",
+              "002"
+            ]
+          },
+          {
+            "carIds": [
+              "003",
+              "004",
+              "005"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

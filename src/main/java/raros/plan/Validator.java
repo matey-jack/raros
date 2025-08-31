@@ -69,7 +69,7 @@ public class Validator {
     }
 
     static void checkForMissingCars(List<String> carIds, List<String> requiredCarIds, String label, List<String> result) {
-        // There doesn't seem to be a Java standard method for immutable set substraction, so we create temporary mutable sets.
+        // There doesn't seem to be a Java standard method for immutable set substraction, so we create a temporary mutable sets.
         var missing = new HashSet<>(requiredCarIds);
         missing.removeAll(carIds);
         if (!missing.isEmpty()) {
@@ -125,49 +125,46 @@ public class Validator {
     }
 
     private void checkStep(ShuntingStep step, List<String> availableTracks, List<String> report) {
-//        if (!availableTracks.contains(step.fromTrack())) {
-//            report.add("fromTrack " + step.fromTrack() + " is not available in the infrastructure.");
-//        }
-//        if (!availableTracks.contains(step.toTrack())) {
-//            report.add("toTrack " + step.toTrack() + " is not available in the infrastructure.");
-//        }
-//        var dropCars = step.dropCars().stream().flatMap(List::stream).toList();
-//        if (!step.pickCars().equals(dropCars)) {
-//            report.add("pickCars [" + String.join(", ", step.pickCars()) + "]" +
-//                    " does not match dropCars [" + String.join(", ", dropCars) + "].");
-//        }
+        if (!availableTracks.contains(step.track())) {
+            report.add("Track " + step.track() + " is not available in the infrastructure.");
+        }
     }
 
-    public List<String> checkResult(Tracks state, Tracks target) {
+    public List<String> checkResult(Tracks result, ShuntingTask target) {
         List<String> report = new ArrayList<>();
         // TODO: check that keySet are the same
-        for (var track : target.tracks().keySet()) {
-            checkTrack(track, state.tracks().get(track).trains(), target.tracks().get(track).trains(), report);
+        if (!result.tracks().keySet().equals(target.targetTracks().keySet())) {
+            report.add("Result has different track IDs than target.");
+        }
+        for (var track : result.tracks().entrySet()) {
+            TrackTrains targetTrack = target.targetTracks().get(track.getKey());
+            checkTrack(track.getKey(), track.getValue().trains(), targetTrack.trains(), report);
         }
         return report;
     }
 
-    private void checkTrack(String track, List<Train> trains, List<Train> requests, List<String> report) {
-        if (trains.size() != requests.size()) {
+    private void checkTrack(String track, List<Train> result, List<Train> request, List<String> report) {
+        if (result.size() != request.size()) {
             report.add(
-                    "Track " + track + " has " + trains.size() + " trains, " +
-                            "but should have " + requests.size() + ".");
+                    "Track " + track + " has " + result.size() + " trains, " +
+                            "but should have " + request.size() + ".");
             return;
         }
-        for (var i = 0; i < trains.size(); i++) {
-            checkTrain(track, i, trains.get(i), requests.get(i), report);
+        for (var i = 0; i < result.size(); i++) {
+            checkTrain(track, i, result.get(i), request.get(i), report);
         }
     }
 
-    private void checkTrain(String track, int trainNumber, Train train, Train request, List<String> report) {
-        var targetSize = request.carIds().size();
-        if (train.carIds().size() != targetSize) {
+    private void checkTrain(String track, int trainNumber, Train result, Train request, List<String> report) {
+        int resultingSize = result.carIds().size();
+        int targetSize = request.carIds().size();
+        if (resultingSize != targetSize) {
             report.add(
                     "Train " + trainNumber + " on track " + track + ":" +
-                            " expected " + targetSize + " cars, but only got " + train.carIds().size() + ".");
+                            " expected " + targetSize + " cars, but only got " + resultingSize + ".");
             return;
         }
-        var actualCars = new HashSet<>(train.carIds());
+        var actualCars = new HashSet<>(result.carIds());
         var expectedCars = new HashSet<>(request.carIds());
         if (!actualCars.equals(expectedCars)) {
             report.add(
@@ -176,4 +173,7 @@ public class Validator {
             );
         }
     }
+
+    // TODO: we have set difference in three different places with different handling.
+    //       Let's make one method that prints out the difference using left/right terminology, so it can be reused everywhere.
 }
