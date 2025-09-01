@@ -3,7 +3,6 @@ package raros.plan;
 import util.Maps;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Planner {
     private final Tracks given;
@@ -91,7 +90,7 @@ public class Planner {
     //       Then the track selector can decide whether to move some of the blocked cars away.
     //       We need to change the drop track for the "drop in case of full target track"... this could be either the track with highest capacity
     //       or also depend on the target track: one temp track for each full target track would make sense!
-    int removableCars(String trackId, List<Train> trains, Map<String, Integer> capacityPerTargetTrack){
+    int removableCars(String trackId, List<Train> trains, Map<String, Integer> capacityPerTargetTrack) {
         // count the number of cars by target track.
         Map<String, Integer> targetCarsPerTrack = new HashMap<>();
         for (var train : trains) {
@@ -102,8 +101,10 @@ public class Planner {
 
         // then cap the numbers by capacity (ignoring the current track) and add them up
         int result = 0;
-        for (var targetCars: targetCarsPerTrack.entrySet()) {
-            if (targetCars.getKey().equals(trackId)) { continue; }
+        for (var targetCars : targetCarsPerTrack.entrySet()) {
+            if (targetCars.getKey().equals(trackId)) {
+                continue;
+            }
             result += Math.min(targetCars.getValue(), capacityPerTargetTrack.get(targetCars.getKey()));
         }
         return result;
