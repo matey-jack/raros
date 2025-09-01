@@ -79,16 +79,4 @@ public class Simulator {
         }
         t.carIds().removeLast();
     }
-
-    void addCars(List<List<String>> packets, List<Train> trains) {
-        // if there is already something on the target track, add the first packet to the last train
-        if (!trains.isEmpty()) {
-            trains.getLast().carIds().addAll(packets.getFirst());
-            packets.removeFirst();
-        }
-        // add all other packets as separate trains
-        for (var p : packets) {
-            trains.add(new Train(p));
-        }
-    }
 }

@@ -9,10 +9,6 @@ public class Planner {
     private final ShuntingTask task;
     private final Map<String, String> targetTracksByCarId = new HashMap<>();
     private final Map<String, TrackTrains> currentState;
-    private List<String> carsOnLocomotive = new ArrayList<>();
-
-    // TODO: maybe not needed
-    private final List<String> targetTracks = new ArrayList<>();
 
     Planner(Tracks given, ShuntingTask task) {
         this.given = given;
@@ -40,7 +36,7 @@ public class Planner {
             List<String> pickedCars = currentState.get(currentTrack).pickAll();
             // copy the list to an immutable one
             result.add(new Pick(currentTrack, pickedCars.stream().toList()));
-            carsOnLocomotive = pickedCars.reversed();
+            List<String> carsOnLocomotive = pickedCars.reversed();
             while (!carsOnLocomotive.isEmpty()) {
                 // if the target track has capacity, move there, otherwise drop it again on the current track
                 String targetTrack = targetTracksByCarId.get(carsOnLocomotive.getLast());
@@ -59,8 +55,6 @@ public class Planner {
     }
 
     void initTargetTracks() {
-        targetTracks.addAll(task.targetTracks().keySet());
-
         for (var track : task.targetTracks().entrySet()) {
             var trackId = track.getKey();
             for (Train train : track.getValue().trains()) {
