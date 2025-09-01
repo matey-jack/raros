@@ -63,7 +63,7 @@
       },
       {
         "type": "DROP",
-        "track": "41",
+        "track": "45",
         "cars": [
           "008",
           "009"
@@ -76,14 +76,15 @@
           "010",
           "011"
         ],
-        "couple": true
+       "couple": true
       },
       {
         "type": "DROP",
         "track": "41",
         "cars": [
           "012"
-        ]
+        ],
+        "couple": true
       },
       {
         "type": "PICK",
