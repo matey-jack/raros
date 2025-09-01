@@ -2,6 +2,7 @@ package raros.plan;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public record TrackTrains(
         List<Train> trains
@@ -11,7 +12,11 @@ public record TrackTrains(
     }
 
     public TrackTrains copy() {
-        return new TrackTrains(trains().stream().map(Train::copy).toList());
+        return new TrackTrains(
+                trains().stream()
+                        .map(Train::copy)
+                        .collect(Collectors.toCollection(ArrayList::new))
+        );
     }
 
     public List<String> pickAll() {
@@ -19,6 +24,7 @@ public record TrackTrains(
         for (var train : trains()) {
             result.addAll(train.carIds());
         }
+        trains().clear();
         return result;
     }
 }
