@@ -9,11 +9,15 @@ public record Train(
         // But in a description of the actual state (before or after the shunting is done), the order matches reality.
         List<String> carIds
 ) {
+    public Train() {
+        this(new ArrayList<>());
+    }
+
     public int size() {
         return carIds.size();
     }
 
-    public Train() {
-        this(new ArrayList<>());
+    public Train copy() {
+        return new Train(new ArrayList<>(carIds));
     }
 }

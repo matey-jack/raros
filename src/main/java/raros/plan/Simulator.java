@@ -1,5 +1,7 @@
 package raros.plan;
 
+import util.Maps;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,11 +21,13 @@ public class Simulator {
     public static Tracks simulate(Tracks given, ShuntingPlan plan) {
         var sim = new Simulator(given);
         sim.processPlan(plan);
+        // We can return the state without copying, because nothing will change it anymore.
         return new Tracks(sim.currentTracks);
     }
 
     Simulator(Tracks given) {
-        currentTracks = given.tracks();
+        // deep copy the input value, so we don't mutate it later.
+        currentTracks = Maps.mapValues(given.tracks(), TrackTrains::copy);
     }
 
     private void processPlan(ShuntingPlan plan) {
