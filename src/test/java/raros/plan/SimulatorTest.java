@@ -27,7 +27,6 @@ class SimulatorTest {
 
     @Test
     void testMedium() {
-        // TODO: fix shunting-plan.json
         testFolder("medium");
     }
 }
