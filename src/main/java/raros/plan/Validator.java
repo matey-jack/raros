@@ -17,7 +17,7 @@ public class Validator {
 
         4. Total number of wagons doesn't exceed (numTracks-1)*maxWagonsPerTrack.
      */
-    public List<String> validateTask(Tracks given, ShuntingTask task, List<String> availableTracks) {
+    public static List<String> validateTask(Tracks given, ShuntingTask task) {
         List<String> result = new ArrayList<>();
         Map<String, TrackTrains> givenTracks = given.tracks();
         var givenCarIds = getAllCarIds(givenTracks);
@@ -27,8 +27,7 @@ public class Validator {
         checkForDuplicates(targetCarIds, "target", result);
         checkForMissingCars(givenCarIds, targetCarIds, "given", result);
         checkForMissingCars(targetCarIds, givenCarIds, "target", result);
-        checkTracksExist(givenTracks.keySet(), "given", availableTracks, result);
-        checkTracksExist(targetTracks.keySet(), "target", availableTracks, result);
+        checkTrackIds(givenTracks, targetTracks, result);
         checkTrackCapacity(givenTracks, "given", task.maxWagonsPerTrack(), result);
         checkTrackCapacity(targetTracks, "target", task.maxWagonsPerTrack(), result);
         oneTrainPerTrack(targetTracks, result);
@@ -80,17 +79,18 @@ public class Validator {
         }
     }
 
-    static <T extends Train> void checkTracksExist(Set<String> trackIds, String label, List<String> availableTracks, List<String> results) {
-        var invalidTracks = new HashSet<>(trackIds);
-        invalidTracks.removeAll(availableTracks);
-        if (!invalidTracks.isEmpty()) {
+    static <V, W> void checkTrackIds(Map<String, V> given, Map<String, W> target, List<String> results) {
+        var givenKeys = given.keySet();
+        var targetKeys = target.keySet();
+        if (!givenKeys.equals(targetKeys)) {
             results.add(
-                    "The " + label + " tracks " + String.join(", ", invalidTracks) + " don't exist in the infrastructure."
+                    "Given tracks [" + String.join(", ", givenKeys) + "] do not match " +
+                            "target tracks [" + String.join(", ", targetKeys) + "]."
             );
         }
     }
 
-    private void checkTrackCapacity(Map<String, TrackTrains> givenTracks, String label, int capacity, List<String> result) {
+    private static void checkTrackCapacity(Map<String, TrackTrains> givenTracks, String label, int capacity, List<String> result) {
         for (var track : givenTracks.entrySet()) {
             int numCars = track.getValue().size();
             if (numCars > capacity) {
@@ -99,7 +99,7 @@ public class Validator {
         }
     }
 
-    private void oneTrainPerTrack(Map<String, TrackTrains> targetTracks, List<String> result) {
+    private static void oneTrainPerTrack(Map<String, TrackTrains> targetTracks, List<String> result) {
         for (var track : targetTracks.entrySet()) {
             if (track.getValue().trains().size() > 1) {
                 result.add("Track " + track.getKey() + " has more than one train.");
@@ -107,7 +107,7 @@ public class Validator {
         }
     }
 
-    private void checkSpareCapacity(ShuntingTask task, int numWagons, List<String> result) {
+    private static void checkSpareCapacity(ShuntingTask task, int numWagons, List<String> result) {
         var numTracks = task.targetTracks().size();
         var capacity = (numTracks - 1) * task.maxWagonsPerTrack();
         if (numWagons > capacity) {
@@ -116,7 +116,7 @@ public class Validator {
         }
     }
 
-    public List<String> validatePlan(ShuntingPlan plan, List<String> availableTracks) {
+    public static List<String> validatePlan(ShuntingPlan plan, List<String> availableTracks) {
         List<String> report = new ArrayList<>();
         for (var step : plan.steps()) {
             checkStep(step, availableTracks, report);
@@ -124,15 +124,14 @@ public class Validator {
         return report;
     }
 
-    private void checkStep(ShuntingStep step, List<String> availableTracks, List<String> report) {
+    private static void checkStep(ShuntingStep step, List<String> availableTracks, List<String> report) {
         if (!availableTracks.contains(step.track())) {
             report.add("Track " + step.track() + " is not available in the infrastructure.");
         }
     }
 
-    public List<String> checkResult(Tracks result, ShuntingTask target) {
+    public static List<String> checkResult(Tracks result, ShuntingTask target) {
         List<String> report = new ArrayList<>();
-        // TODO: check that keySet are the same
         if (!result.tracks().keySet().equals(target.targetTracks().keySet())) {
             report.add("Result has different track IDs than target.");
         }
@@ -143,7 +142,7 @@ public class Validator {
         return report;
     }
 
-    private void checkTrack(String track, List<Train> result, List<Train> request, List<String> report) {
+    private static void checkTrack(String track, List<Train> result, List<Train> request, List<String> report) {
         if (result.size() != request.size()) {
             report.add(
                     "Track " + track + " has " + result.size() + " trains, " +
@@ -155,7 +154,7 @@ public class Validator {
         }
     }
 
-    private void checkTrain(String track, int trainNumber, Train result, Train request, List<String> report) {
+    private static void checkTrain(String track, int trainNumber, Train result, Train request, List<String> report) {
         int resultingSize = result.carIds().size();
         int targetSize = request.carIds().size();
         if (resultingSize != targetSize) {
