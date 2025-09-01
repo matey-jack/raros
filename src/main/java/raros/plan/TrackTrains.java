@@ -27,4 +27,11 @@ public record TrackTrains(
         trains().clear();
         return result;
     }
+
+    public void addCars(List<String> cars, boolean couple) {
+        if (!couple) {
+            trains().add(new Train());
+        }
+        trains().getLast().carIds().addAll(cars);
+    }
 }

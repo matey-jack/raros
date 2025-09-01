@@ -12,10 +12,14 @@ class PlannerTest {
         var given = serde.read("src/test/resources/" + folderName + "/given.json", Tracks.class);
         var target = serde.read("src/test/resources/" + folderName + "/target.json", ShuntingTask.class);
         var expectedPlan = serde.read("src/test/resources/" + folderName + "/shunting-plan.json", ShuntingPlan.class);
-        var planResult = new Planner(given, target).planAndValidate();
 
-        // serde.write(planResult.plan(), "src/test/resources/" + folderName + "/generated-plan.json");
-        var report = Validator.checkResult(planResult.resultingTracks(), target);
+        var actualPlan = new Planner(given, target).createPlan();
+        serde.write(actualPlan, "src/test/resources/" + folderName + "/generated-plan.json");
+
+        var result = Simulator.simulate(given, actualPlan);
+        serde.write(result, "src/test/resources/" + folderName + "/generated-result.json");
+
+        var report = Validator.checkResult(result, target);
         for (var line : report) {
             System.out.println(line);
         }
@@ -23,13 +27,11 @@ class PlannerTest {
     }
 
     @Test
-    @Disabled(value = "this times out because of endless loop (I think)")
     void testSimple() {
         testFolder("simple");
     }
 
     @Test
-    @Disabled(value = "this times out because of endless loop (I think)")
     void testMedium() {
         // TODO: fix shunting-plan.json
         testFolder("medium");

@@ -38,13 +38,16 @@ public class Planner {
         while (currentTrack != null) {
             // add one Pick and multiple Drop steps until all cars are distributed or only cars with full target tracks are left.
             List<String> pickedCars = currentState.get(currentTrack).pickAll();
-            result.add(new Pick(currentTrack, pickedCars));
-            carsOnLocomotive = pickedCars;
+            // copy the list to an immutable one
+            result.add(new Pick(currentTrack, pickedCars.stream().toList()));
+            carsOnLocomotive = pickedCars.reversed();
             while (!carsOnLocomotive.isEmpty()) {
                 // if the target track has capacity, move there, otherwise drop it again on the current track
                 String targetTrack = targetTracksByCarId.get(carsOnLocomotive.getLast());
                 String dropTrack = currentState.get(targetTrack).size() < task.maxWagonsPerTrack() ? targetTrack : currentTrack;
-                result.add(new Drop(dropTrack, List.of(carsOnLocomotive.getLast()), false));
+                boolean couple = !currentState.get(targetTrack).trains().isEmpty();
+                result.add(new Drop(dropTrack, List.of(carsOnLocomotive.getLast()), couple));
+                currentState.get(targetTrack).addCars(List.of(carsOnLocomotive.getLast()), couple);
                 carsOnLocomotive.removeLast();
             }
             // updating current state on the go

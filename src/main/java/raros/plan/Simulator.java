@@ -38,7 +38,8 @@ public class Simulator {
     }
 
     void processStep(int stepNo, ShuntingStep step) {
-        List<Train> trackTrains = currentTracks.get(step.track()).trains();
+        TrackTrains track = currentTracks.get(step.track());
+        List<Train> trackTrains = track.trains();
         try {
             if (step instanceof Pick) {
                 for (var car : step.cars().reversed()) {
@@ -49,10 +50,7 @@ public class Simulator {
                 for (var car : step.cars()) {
                     removeFromLocomotive(car);
                 }
-                if (!((Drop) step).couple()) {
-                    trackTrains.add(new Train());
-                }
-                trackTrains.getLast().carIds().addAll(step.cars());
+                track.addCars(step.cars(), ((Drop) step).couple());
             }
         } catch (Exception e) {
             throw new RuntimeException("Error in step " + stepNo + ": " + e.getMessage(), e);
