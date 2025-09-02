@@ -110,7 +110,7 @@ public class Validator {
 
     private static void checkTrackCapacity(Map<String, TrackTrains> givenTracks, String label, int capacity, List<String> result) {
         for (var track : givenTracks.entrySet()) {
-            int numCars = track.getValue().size();
+            int numCars = track.getValue().numberOfCars();
             if (numCars > capacity) {
                 result.add(label + " track " + track.getKey() + " has " + numCars + " cars, but only " + capacity + " are allowed.");
             }

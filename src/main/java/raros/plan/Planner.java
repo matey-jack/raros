@@ -48,7 +48,7 @@ public class Planner {
             while (!carsOnLocomotive.isEmpty()) {
                 // if the target track has capacity, move there, otherwise drop it again on the current track
                 String targetTrack = targetTracksByCarId.get(carsOnLocomotive.getLast());
-                String dropTrack = currentState.get(targetTrack).size() < task.maxWagonsPerTrack() ? targetTrack : currentTrack;
+                String dropTrack = currentState.get(targetTrack).numberOfCars() < task.maxWagonsPerTrack() ? targetTrack : currentTrack;
                 boolean couple = !currentState.get(dropTrack).trains().isEmpty();
                 List<String> dropCars = List.of(carsOnLocomotive.getLast());
                 result.add(new Drop(dropTrack, new ArrayList<>(dropCars), couple));
@@ -115,16 +115,15 @@ public class Planner {
         }
     }
 
-    // TODO: complex enough to warrant some unit tests :/
     // Returns the id of the track with the most "removable cars", i.e. cars whose target track has free capacity.
     // Since the value is 0 for tracks with only correct cars, we will automatically ignore them.
     // Return value of _null_ means that all cars are properly sorted!
     String getTrackToProcess() {
-        Map<String, Integer> capacityPerTrack = Maps.mapValues(currentState, tt -> task.maxWagonsPerTrack() - tt.size());
+        var capacityPerTrack = getCapacityPerTrack();
         String result = null;
         int maxToRemove = 0;
         for (var track : currentState.entrySet()) {
-            int removableCars = removableCars(track.getKey(), track.getValue().trains(), capacityPerTrack);
+            int removableCars = removableCars(track.getKey(), capacityPerTrack);
             if (removableCars > maxToRemove) {
                 maxToRemove = removableCars;
                 result = track.getKey();
@@ -133,14 +132,18 @@ public class Planner {
         return result;
     }
 
+    Map<String, Integer> getCapacityPerTrack() {
+        return Maps.mapValues(currentState, tt -> task.maxWagonsPerTrack() - tt.numberOfCars());
+    }
+
     // TODO: maybe the way to avoid the "swap-worst-case" is to return "blocked cars" separately.
     //       Then the track selector can decide whether to move some of the blocked cars away.
     //       We need to change the drop track for the "drop in case of full target track"... this could be either the track with highest capacity
     //       or also depend on the target track: one temp track for each full target track would make sense!
-    int removableCars(String trackId, List<Train> trains, Map<String, Integer> capacityPerTargetTrack) {
+    int removableCars(String trackId, Map<String, Integer> capacityPerTargetTrack) {
         // count the number of cars by target track.
         Map<String, Integer> targetCarsPerTrack = new HashMap<>();
-        for (var train : trains) {
+        for (var train : currentState.get(trackId).trains()) {
             for (var carId : train.carIds()) {
                 targetCarsPerTrack.merge(targetTracksByCarId.get(carId), 1, Integer::sum);
             }

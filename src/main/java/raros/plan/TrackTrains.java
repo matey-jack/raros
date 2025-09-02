@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 public record TrackTrains(
         List<Train> trains
 ) {
-    public int size() {
+    public int numberOfCars() {
         return trains().stream().mapToInt(Train::size).sum();
     }
 
