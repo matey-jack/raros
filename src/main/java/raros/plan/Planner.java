@@ -50,18 +50,59 @@ public class Planner {
                 String targetTrack = targetTracksByCarId.get(carsOnLocomotive.getLast());
                 String dropTrack = currentState.get(targetTrack).size() < task.maxWagonsPerTrack() ? targetTrack : currentTrack;
                 boolean couple = !currentState.get(targetTrack).trains().isEmpty();
-                result.add(new Drop(dropTrack, List.of(carsOnLocomotive.getLast()), couple));
-                currentState.get(targetTrack).addCars(List.of(carsOnLocomotive.getLast()), couple);
+                List<String> dropCars = List.of(carsOnLocomotive.getLast());
+                result.add(new Drop(dropTrack, new ArrayList<>(dropCars), couple));
+                currentState.get(targetTrack).addCars(dropCars, couple);
                 carsOnLocomotive.removeLast();
             }
             // updating current state on the go
             currentTrack = getTrackToProcess();
         }
-        // TODO: the plan can have redundant steps when the first Drop goes to currentTrack again or multiple Drops go to the same track.
-        //      Remove that in post-processing.
+        compressPlan(result);
         return new ShuntingPlan(result);
     }
 
+    /***
+     * Removes redundant steps from the plan.
+     * Drop+Drop becomes a larger Drop, while Drop+Pick (and Pick+Drop) becomes a smaller Pick.
+     */
+    void compressPlan(List<ShuntingStep> plan) {
+        var i = 0;
+        // it has to be a while loop, because we progress either be advancing the index or shorteing the list.
+        while (i < plan.size() - 1) {
+            ShuntingStep first = plan.get(i);
+            ShuntingStep second = plan.get(i + 1);
+            if (first.track().equals(second.track())) {
+                // Modify the first step and remove the second.
+                if (first instanceof Pick) {
+                    if (second instanceof Drop) {
+                        // Modify the Pick to not take the cars that would be dropped next.
+                        first.cars().subList(0, second.cars().size()).clear();
+                    } else {
+                        // Note that even if we removed a lot of Drop steps after a Pick, there should be at least one Drop left,
+                        // since the Pick track was chosen to have at least one car going to a different track.
+                        throw new IllegalArgumentException("Subsequent Pick steps should not happen!");
+                    }
+                    plan.remove(i+1);
+                } else {
+                    if (second instanceof Drop) {
+                        // Drop all cars in the first step.
+                        first.cars().addAll(second.cars());
+                        plan.remove(i+1);
+                    } else {
+                        // Instead of Drop followed by Pick, keep the cars on the locomotive.
+                        // Note that this is the only case, where we remove the first step.
+                        // Also note that all our modifications are easier because Pick always picks the whole track full of cars.
+                        // This is why we can be sure that the cars in the Drop are actually on the pick and can be removed.
+                        second.cars().reversed().subList(0, first.cars().size()).clear();
+                        plan.remove(i);
+                    }
+                }
+            } else {
+                i++;
+            }
+        }
+    }
     void initTargetTracks() {
         for (var track : task.targetTracks().entrySet()) {
             var trackId = track.getKey();
