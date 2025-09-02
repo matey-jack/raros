@@ -43,16 +43,16 @@ public class Planner {
             // add one Pick and multiple Drop steps until all cars are distributed or only cars with full target tracks are left.
             List<String> pickedCars = currentState.get(currentTrack).pickAll();
             // copy the list to an immutable one
-            result.add(new Pick(currentTrack, pickedCars.stream().toList()));
+            result.add(new Pick(currentTrack, new ArrayList<>(pickedCars)));
             List<String> carsOnLocomotive = pickedCars.reversed();
             while (!carsOnLocomotive.isEmpty()) {
                 // if the target track has capacity, move there, otherwise drop it again on the current track
                 String targetTrack = targetTracksByCarId.get(carsOnLocomotive.getLast());
                 String dropTrack = currentState.get(targetTrack).size() < task.maxWagonsPerTrack() ? targetTrack : currentTrack;
-                boolean couple = !currentState.get(targetTrack).trains().isEmpty();
+                boolean couple = !currentState.get(dropTrack).trains().isEmpty();
                 List<String> dropCars = List.of(carsOnLocomotive.getLast());
                 result.add(new Drop(dropTrack, new ArrayList<>(dropCars), couple));
-                currentState.get(targetTrack).addCars(dropCars, couple);
+                currentState.get(dropTrack).addCars(dropCars, couple);
                 carsOnLocomotive.removeLast();
             }
             // updating current state on the go
@@ -103,6 +103,7 @@ public class Planner {
             }
         }
     }
+
     void initTargetTracks() {
         for (var track : task.targetTracks().entrySet()) {
             var trackId = track.getKey();
@@ -119,7 +120,7 @@ public class Planner {
     // Since the value is 0 for tracks with only correct cars, we will automatically ignore them.
     // Return value of _null_ means that all cars are properly sorted!
     String getTrackToProcess() {
-        Map<String, Integer> capacityPerTrack = Maps.mapValues(currentState, tt -> task.maxWagonsPerTrack() - tt.trains().size());
+        Map<String, Integer> capacityPerTrack = Maps.mapValues(currentState, tt -> task.maxWagonsPerTrack() - tt.size());
         String result = null;
         int maxToRemove = 0;
         for (var track : currentState.entrySet()) {
