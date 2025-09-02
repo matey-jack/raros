@@ -3,6 +3,7 @@ package raros.plan;
 import util.Maps;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Planner {
     private final Tracks given;
@@ -29,7 +30,7 @@ public class Planner {
         Validator.validateTrainTracks(result.tracks(), "planning result", task.maxWagonsPerTrack(), validationResult);
         if (!validationResult.isEmpty()) {
             System.out.println("Validation problems:");
-            for (var p: validationResult) {
+            for (var p : validationResult) {
                 System.out.println(p);
             }
         }
@@ -48,7 +49,9 @@ public class Planner {
             while (!carsOnLocomotive.isEmpty()) {
                 // if the target track has capacity, move there, otherwise drop it again on the current track
                 String targetTrack = targetTracksByCarId.get(carsOnLocomotive.getLast());
-                String dropTrack = currentState.get(targetTrack).numberOfCars() < task.maxWagonsPerTrack() ? targetTrack : currentTrack;
+                String dropTrack = currentState.get(targetTrack).numberOfCars() < task.maxWagonsPerTrack()
+                        ? targetTrack
+                        : getTrackWithLeastCarsExcept(currentTrack);
                 boolean couple = !currentState.get(dropTrack).trains().isEmpty();
                 List<String> dropCars = List.of(carsOnLocomotive.getLast());
                 result.add(new Drop(dropTrack, new ArrayList<>(dropCars), couple));
@@ -60,6 +63,13 @@ public class Planner {
         }
         compressPlan(result);
         return new ShuntingPlan(result);
+    }
+
+    String getTrackWithLeastCarsExcept(String exceptTrackId) {
+        // Note that we use the negative to avoid having to program a Maps.min function
+        Map<String, Integer> carsPerTrack = Maps.mapValues(currentState, tt -> -tt.numberOfCars());
+        carsPerTrack.remove(exceptTrackId);
+        return Maps.max(carsPerTrack).get();
     }
 
     /***
@@ -83,15 +93,15 @@ public class Planner {
                         // since the Pick track was chosen to have at least one car going to a different track.
                         throw new IllegalArgumentException("Subsequent Pick steps should not happen!");
                     }
-                    plan.remove(i+1);
+                    plan.remove(i + 1);
                 } else {
                     if (second instanceof Drop) {
                         // Drop all cars in the first step.
                         first.cars().addAll(second.cars());
-                        plan.remove(i+1);
+                        plan.remove(i + 1);
                     } else {
                         // Instead of Drop followed by Pick, keep the cars on the locomotive.
-                        // Note that this is the only case, where we remove the first step.
+                        // Note that this is the only case where we remove the first step.
                         // Also note that all our modifications are easier because Pick always picks the whole track full of cars.
                         // This is why we can be sure that the cars in the Drop are actually on the pick and can be removed.
                         second.cars().reversed().subList(0, first.cars().size()).clear();
@@ -120,37 +130,41 @@ public class Planner {
     // Return value of _null_ means that all cars are properly sorted!
     String getTrackToProcess() {
         var capacityPerTrack = getCapacityPerTrack();
-        String result = null;
-        int maxToRemove = 0;
-        for (var track : currentState.entrySet()) {
-            int removableCars = removableCars(track.getKey(), capacityPerTrack);
-            if (removableCars > maxToRemove) {
-                maxToRemove = removableCars;
-                result = track.getKey();
-            }
+        var removableCars = Maps.createMap(currentState.keySet(), (trackId -> removableCars(trackId, capacityPerTrack)));
+        var trackWithMostRemovableCars = Maps.max(removableCars).get();
+        if (removableCars.get(trackWithMostRemovableCars) > 0) {
+            return trackWithMostRemovableCars;
         }
-        return result;
+
+        // If no cars are removable, we might have a deadlock, so let's look for unfinished cars instead.
+        var unfinishedCars = Maps.createMap(currentState.keySet(), this::unfinishedCars);
+        var trackWithMostUnfinishedCars = Maps.max(unfinishedCars).get();
+        if (unfinishedCars.get(trackWithMostUnfinishedCars) != 0) {
+            return trackWithMostUnfinishedCars;
+        }
+        return null;
     }
 
     Map<String, Integer> getCapacityPerTrack() {
         return Maps.mapValues(currentState, tt -> task.maxWagonsPerTrack() - tt.numberOfCars());
     }
 
-    // TODO: maybe the way to avoid the "swap-worst-case" is to return "blocked cars" separately.
-    //       Then the track selector can decide whether to move some of the blocked cars away.
-    //       We need to change the drop track for the "drop in case of full target track"... this could be either the track with highest capacity
-    //       or also depend on the target track: one temp track for each full target track would make sense!
-    int removableCars(String trackId, Map<String, Integer> capacityPerTargetTrack) {
+    /***
+     * @return Number of cars on @param trackId which need to be moved to another track.
+     */
+    long unfinishedCars(String trackId) {
+        return currentState.get(trackId).getAllCars().stream()
+                .filter(car -> !targetTracksByCarId.get(car).equals(trackId))
+                .count();
+    }
+
+    long removableCars(String trackId, Map<String, Integer> capacityPerTargetTrack) {
         // count the number of cars by target track.
-        Map<String, Integer> targetCarsPerTrack = new HashMap<>();
-        for (var train : currentState.get(trackId).trains()) {
-            for (var carId : train.carIds()) {
-                targetCarsPerTrack.merge(targetTracksByCarId.get(carId), 1, Integer::sum);
-            }
-        }
+        var targetCarsPerTrack = currentState.get(trackId).getAllCars().stream()
+                .collect(Collectors.groupingBy(targetTracksByCarId::get, Collectors.counting()));
 
         // then cap the numbers by capacity (ignoring the current track) and add them up
-        int result = 0;
+        long result = 0;
         for (var targetCars : targetCarsPerTrack.entrySet()) {
             if (targetCars.getKey().equals(trackId)) {
                 continue;

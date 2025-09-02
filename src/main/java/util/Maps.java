@@ -1,7 +1,10 @@
 package util;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Maps {
@@ -24,5 +27,27 @@ public class Maps {
                         Map.Entry::getKey,
                         e -> transform.apply(e.getValue())
                 ));
+    }
+
+    public static <K, V> Map<K, V> filterValues(
+            Map<K, V> map,
+            Predicate<V> condition
+    ) {
+        return map.entrySet().stream()
+                .filter(e -> condition.test(e.getValue()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue
+                ));
+    }
+
+    public static <K, V extends Comparable<V>> Optional<K> max(
+            Map<K, V> map
+    ) {
+        return map.entrySet().stream().max(Map.Entry.comparingByValue()).map(Map.Entry::getKey);
+    }
+
+    public static <T> Map<String, T> createMap(Collection<String> keys, Function<String, T> valueMapper) {
+        return keys.stream().collect(Collectors.toMap(Function.identity(), valueMapper));
     }
 }
