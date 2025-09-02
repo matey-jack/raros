@@ -4,18 +4,12 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Maps {
     /**
      * Kotlin-style mapValues for Java.
      *
-     * @param map       the input map
-     * @param transform function to transform each value
-     * @param <K>       key type
-     * @param <V>       input value type
-     * @param <R>       result value type
      * @return a new Map with the same keys and transformed values.
      */
     public static <K, V, R> Map<K, R> mapValues(
@@ -29,22 +23,10 @@ public class Maps {
                 ));
     }
 
-    public static <K, V> Map<K, V> filterValues(
-            Map<K, V> map,
-            Predicate<V> condition
-    ) {
-        return map.entrySet().stream()
-                .filter(e -> condition.test(e.getValue()))
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue
-                ));
-    }
-
-    public static <K, V extends Comparable<V>> Optional<K> max(
+    public static <K, V extends Comparable<V>> Optional<Map.Entry<K,V>> max(
             Map<K, V> map
     ) {
-        return map.entrySet().stream().max(Map.Entry.comparingByValue()).map(Map.Entry::getKey);
+        return map.entrySet().stream().max(Map.Entry.comparingByValue());
     }
 
     public static <T> Map<String, T> createMap(Collection<String> keys, Function<String, T> valueMapper) {

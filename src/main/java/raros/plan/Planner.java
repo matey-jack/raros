@@ -69,7 +69,7 @@ public class Planner {
         // Note that we use the negative to avoid having to program a Maps.min function
         Map<String, Integer> carsPerTrack = Maps.mapValues(currentState, tt -> -tt.numberOfCars());
         carsPerTrack.remove(exceptTrackId);
-        return Maps.max(carsPerTrack).get();
+        return Maps.max(carsPerTrack).get().getKey();
     }
 
     /***
@@ -131,16 +131,16 @@ public class Planner {
     String getTrackToProcess() {
         var capacityPerTrack = getCapacityPerTrack();
         var removableCars = Maps.createMap(currentState.keySet(), (trackId -> removableCars(trackId, capacityPerTrack)));
-        var trackWithMostRemovableCars = Maps.max(removableCars).get();
-        if (removableCars.get(trackWithMostRemovableCars) > 0) {
-            return trackWithMostRemovableCars;
+        var maxRemovableCars = Maps.max(removableCars).get();
+        if (maxRemovableCars.getValue() > 0) {
+            return maxRemovableCars.getKey();
         }
 
         // If no cars are removable, we might have a deadlock, so let's look for unfinished cars instead.
         var unfinishedCars = Maps.createMap(currentState.keySet(), this::unfinishedCars);
-        var trackWithMostUnfinishedCars = Maps.max(unfinishedCars).get();
-        if (unfinishedCars.get(trackWithMostUnfinishedCars) != 0) {
-            return trackWithMostUnfinishedCars;
+        var maxUnfinishedCars = Maps.max(unfinishedCars).get();
+        if (maxUnfinishedCars.getValue() > 0) {
+            return maxUnfinishedCars.getKey();
         }
         return null;
     }
