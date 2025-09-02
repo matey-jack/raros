@@ -19,22 +19,40 @@ public class Validator {
      */
     public static List<String> validateTask(Tracks given, ShuntingTask task) {
         List<String> result = new ArrayList<>();
+
         Map<String, TrackTrains> givenTracks = given.tracks();
+        Map<String, TrackTrains> targetTracks = task.targetTracks();
+        validateTrainTracks(givenTracks, "given", task.maxWagonsPerTrack(), result);
+        validateTrainTracks(targetTracks, "target", task.maxWagonsPerTrack(), result);
+
+        oneTrainPerTrack(targetTracks, result);
+
         var givenCarIds = getAllCarIds(givenTracks);
         checkForDuplicates(givenCarIds, "given", result);
-        Map<String, TrackTrains> targetTracks = task.targetTracks();
         var targetCarIds = getAllCarIds(targetTracks);
         checkForDuplicates(targetCarIds, "target", result);
         checkForMissingCars(givenCarIds, targetCarIds, "given", result);
         checkForMissingCars(targetCarIds, givenCarIds, "target", result);
         checkTrackIds(givenTracks, targetTracks, result);
-        checkTrackCapacity(givenTracks, "given", task.maxWagonsPerTrack(), result);
-        checkTrackCapacity(targetTracks, "target", task.maxWagonsPerTrack(), result);
-        oneTrainPerTrack(targetTracks, result);
+
         checkSpareCapacity(task, givenCarIds.size(), result);
         return result;
     }
 
+    static void validateTrainTracks(Map<String, TrackTrains> tracks, String label, int capacity, List<String> result) {
+        noEmptyTrains(tracks, label, result);
+        checkTrackCapacity(tracks, label, capacity, result);
+    }
+
+    static void noEmptyTrains(Map<String, TrackTrains> tracks, String label, List<String> result) {
+        for (var track : tracks.entrySet()) {
+            for (var train : track.getValue().trains()) {
+                if (train.carIds().isEmpty()) {
+                    result.add("[" + label + "] Track " + track.getKey() + " has an empty train.");
+                }
+            }
+        }
+    }
     static List<String> getAllCarIds(Map<String, TrackTrains> tracks) {
         var result = new ArrayList<String>();
         for (var track : tracks.values()) {

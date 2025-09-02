@@ -25,6 +25,14 @@ public class Planner {
         }
         var plan = createPlan();
         var result = Simulator.simulate(given, plan);
+        var validationResult = new ArrayList<String>();
+        Validator.validateTrainTracks(result.tracks(), "planning result", task.maxWagonsPerTrack(), validationResult);
+        if (!validationResult.isEmpty()) {
+            System.out.println("Validation problems:");
+            for (var p: validationResult) {
+                System.out.println(p);
+            }
+        }
         return new PlanningResult(plan, result);
     }
 

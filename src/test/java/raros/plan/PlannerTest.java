@@ -7,6 +7,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 class PlannerTest {
     PlanSerde serde = new PlanSerde();
 
+    @Test
+    void testPlanAndValidate() {
+        var given = serde.read("src/test/resources/simple/given.json", Tracks.class);
+        var target = serde.read("src/test/resources/simple/target.json", ShuntingTask.class);
+        new Planner(given, target).createPlan();
+    }
+
     void testFolder(String folderName) {
         var given = serde.read("src/test/resources/" + folderName + "/given.json", Tracks.class);
         var target = serde.read("src/test/resources/" + folderName + "/target.json", ShuntingTask.class);
