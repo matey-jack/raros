@@ -2,6 +2,10 @@ package raros.plan;
 
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -10,11 +14,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 class PlannerTest {
     PlanSerde serde = new PlanSerde();
 
-    TrackTrains track(Train ...trains) {
+    TrackTrains track(Train... trains) {
         return new TrackTrains(Arrays.asList(trains));
     }
 
-    Train train(int ...ids) {
+    Train train(int... ids) {
         return new Train(Arrays.stream(ids).mapToObj(Integer::toString).toList());
     }
 
@@ -77,4 +81,34 @@ class PlannerTest {
         testFolder("hard");
     }
 
+    /**
+     * This example shows that the first move is really stupid,
+     * but after that, the plan is puts at least one additional car on the target track for every Pick.
+     */
+    @Test
+    void testDegenerateCase() throws IOException {
+        var given = new Tracks(Map.of(
+                "10", track(train(21, 31)),
+                "20", track(train(10, 40)),
+                "30", track(train(11, 50)),
+                "40", track(train(20)),
+                "50", track(train(30))
+        ));
+        var task = new ShuntingTask(
+                2,
+                Map.of(
+                        "10", track(train(10, 11)),
+                        "20", track(train(20, 21)),
+                        "30", track(train(30, 31)),
+                        "40", track(train(40)),
+                        "50", track(train(50))
+                ));
+        var result = new Planner(given, task).planAndValidate();
+        Path targetDir = Paths.get("src/test/resources/degenerate");
+        if (!Files.exists(targetDir)) {
+            Files.createDirectory(targetDir);
+        }
+        serde.write(result.plan(), "src/test/resources/degenerate/generated-plan.json");
+        serde.write(result.resultingTracks(), "src/test/resources/degenerate/generated-result.json");
+    }
 }

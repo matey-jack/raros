@@ -26,8 +26,7 @@ public class Planner {
         }
         var plan = createPlan();
         var result = Simulator.simulate(given, plan);
-        var validationResult = new ArrayList<String>();
-        Validator.validateTrainTracks(result.tracks(), "planning result", task.maxWagonsPerTrack(), validationResult);
+        var validationResult = Validator.checkResult(result, task);
         if (!validationResult.isEmpty()) {
             System.out.println("Validation problems:");
             for (var p : validationResult) {
