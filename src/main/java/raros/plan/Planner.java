@@ -50,6 +50,8 @@ public class Planner {
                 String targetTrack = targetTracksByCarId.get(carsOnLocomotive.getLast());
                 String dropTrack = currentState.get(targetTrack).numberOfCars() < task.maxWagonsPerTrack()
                         ? targetTrack
+                        // TODO: das Zwischenparken sollte verhindern, dass man sich einen Platz zupark für den man in derselben
+                        // Fuhre noch einen passen Wagen hat!
                         : getTrackWithLeastCarsExcept(currentTrack);
                 boolean couple = !currentState.get(dropTrack).trains().isEmpty();
                 List<String> dropCars = List.of(carsOnLocomotive.getLast());
@@ -81,6 +83,8 @@ public class Planner {
         while (i < plan.size() - 1) {
             ShuntingStep first = plan.get(i);
             ShuntingStep second = plan.get(i + 1);
+// TODO: es gibt noch den Fall 'Pick a, Drop b, Pick c, Drop b', der sich zu 'Pick a, Pick c, Drop b' vereinfachen lässt.
+//       dies allerdings erst in einem zweiten Durchgang, weil vorher mehrere 'Drop a' und 'Drop c' Schritte entfernt werden müssen.
             if (first.track().equals(second.track())) {
                 // Modify the first step and remove the second.
                 if (first instanceof Pick) {
@@ -136,6 +140,8 @@ public class Planner {
         }
 
         // If no cars are removable, we might have a deadlock, so let's look for unfinished cars instead.
+        // (Since in case of deadlock, all tracks with unfinished cars are full and also full in the target state,
+        // the track with most unfinished cars is also the one with the most missing cars, that will be unblocked after freeing the track.)
         var unfinishedCars = Maps.createMap(currentState.keySet(), this::unfinishedCars);
         var maxUnfinishedCars = Maps.max(unfinishedCars).get();
         if (maxUnfinishedCars.getValue() > 0) {

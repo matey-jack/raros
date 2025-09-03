@@ -71,28 +71,50 @@ Damit der ganze Prozess überschaubar bleibt, schlage ich Folgendes vor:
 - Auf dem Ausziehgleis haben auch WG Wagen plus Lokomotive und Sicherheitsabstand zu Weichen Platz.
 - Die Anzahl von insgesamt Wagen vorhandenen Wagen ist beschränkt, sodass mindestens ein Gleis völlig frei sein kann. Nennen wir die gesamte Anzahl der Wagen WW, dann soll also WW ≤ (G-1) × WG sein. 
 
+Die letzte Bedingung ist ziemlich willkürlich. Ohne formalen Beweis zu liefern, vermute ich, dass ein einziger freier Platz ausreicht, um in jedem Fall einen Rangierplan zu erzeugen. Allerdings wird die Anzahl der Schritte viel länger sein, da in jedem Schritt viele Wagen aus einem Gleis gezogen werden, aber nur einer davon auf ein anderes Gleis gestellt wird. Mit mehr Platz, geht alles schneller: im Idealfall wird immer ein ganzes Gleis leer gezogen und alle Wagen direkt auf die Zielgleise verteilt.
 
 d - Algorithmus
 ===============
 
-Wir klassifizieren alle Gleise in solche auf denen bereits nur "korrekte Wagen" (im Zielzustand) stehen ("freie Gleise")
-und solche auf denen noch andere Wagen stehen ("Eingangsgleise").
-Da die Lok ein ganzes Gleis leer ziehen kann, erhalten wir somit mindestens ein freies Gleis.
+Kurz gesagt, wird der Rangierplan wie folgt erstellt:
+ - Man zieht alle Wagen aus einem Gleis heraus und verteilt diese auf ihre Gleise. Wagen, die auf dem gerade gezogenen Gleis schon richtig waren, werden auch wieder dort abgestellt. (Bzw. wenn sie am hinteren Ende standen, gar nicht erst mit ausgezogen.)
+ - Ist dabei ein Zielgleis schon voll (weil dort noch Wagen stehen, die woanders hin gehören), so werden die betreffenden Wagen auf ein anderes Gleis zwischengeparkt. (Dies kann auch das Gleis sein, das wir gerade ausgezogen haben.)
 
-Dritte Idee:
-man könnte es sich fast ganz einfach machen und alle Gleise der Reihe nach ganz herausziehen und Wagen direkt auf das Zielgleis bringen und einfach dort anhängen.
-Wenn das Zielgleis noch nicht "frei" ist, stehen die Wagen halt so lange hinter den anderen Wagen, die dann später noch wegrangiert werden. 
-Dabei kann es aber leider passieren, dass ein Gleis voll wird... in diesem Fall stellt man einfach die aktuell an der Lok befindlichen Wagen ab und zieht das volle Gleis aus, um damit weiter zu arbeiten.
+Man kann sich überlegen, dass dieser Algorithmus immer ein Ende finden wird, wenn man die Anzahl der noch nicht im Zielgleis befindlichen Wagen (genannt N) betrachtet. Da wir richtige stehende Wagen (zwar manchmal ausziehen, aber) niemals auf einem anderen Gleis abstellen, wird N niemals größer werden. Wenn wir also in jedem Schritt mindestens einen Wagen vom falschen auf ein richtiges Gleis abstellen, wird N in jedem Schritt um einen ganzzahligen Betrag reduziert und somit wird N=0 und ein erfolgreiches Ende sicher erreicht werden.
 
-Fakt ist: in jedem Drop, landet mindestens ein Wagen auf dem richtigen Gleis, sodass jeder Wagen zwar sehr oft mit der Lok hin- und her fahren kann, aber nur ein einziges Mal wirklich gedroppt wird.
-Und weil der Algorithmus mit jedem Ausziehen auch mindestens einmal "droppt"
+Um dies zu erreichen, passieren zwei Dinge:
+ 1. Um das Gleis zu wählen, welches ausgezogen werden soll, zählen wir auf allen Gleisen die noch nicht richtig stehenden Wagen und wie viele davon freien Platz auf dem Zielgleis haben. Dann ziehen wir das Gleis, auf dem diese Zahl am höchsten ist (opportunistisch optimiert) – es wird unser N also in jedem Schritt (lokal / opportunistisch) maximal vermindert.
+
+ 2. Es kann passieren, dass noch Wagen falsch stehen, aber alle Zielgleise besetzt sind. Es ist eine Art Deadlock und kommt vor, wenn mindestens zwei Gleise sowohl im Ziel- als auch im Ausgangs-Zustand voll sind UND Wagen wechselseitig auf das andere Gleis sollen. (So eine zirkuläre Abhängigkeit kann auch mehrere Gleise betreffen.) In diesem Fall reicht es, irgendeins der betroffenen Gleise herauszuziehen und die Wagen auf irgendeinem freien Gleis zwischenzuparken. Im nächsten Schritt findet dann Methode 1 wieder ein Gleis, dessen Wagen platziert werden können. (Das kann man beweisen, da im Fall 2 jedes Gleis auf dem noch falsche Wagen stehen, genauso viele Wagen auf anderen Gleisen hat, die dort noch hingehören.) Im übernächsten Schritt (und bei größeren Deadlock-Kreisen) findet Methode 1 übrigens auch garantiert wieder korrekt verschiebbare Wagen, da irgendwann die zwischengeparkten Wagen auf das letzte Gleis im Kreis geschoben werden können.
+
+Man kann auch im Schritt optimieren, indem man zuerst das Gleis auszieht, auf dem die meisten falschen Wagen stehen. Da ein Gleis Teil von mehreren Deadlock-Kreisen sein kann, können auch mehrere solche mit einem Zug aufgebrochen werden. Aber genauso wie jene im Schritt 1 ist es nur eine heuristische Optimierung.
+
+Damit ist bewiesen, dass das Rangieren nicht ewig dauern wird, und zwar höchstens so lange wie die Anzahl der Wagen im System plus die Anzahl der Deadlock-Kreise. Letztere kann zwar sehr hoch sein, aber in der Praxis ist sie das wohl eher nicht und die Heuristik ist auch oft schneller als ihre obere Schranke. Im Übrigen kann man an den Test-Beispielen sehen, dass die Heuristik sehr gut freie Plätze im System ausnutzt. Je weniger Wagen vorhanden sind, desto schneller wird alles gehen. Es werden dann auch automatisch bereits zusammenhängende Gruppen von Wagen zusammen verschoben, was viel Kuppelarbeit spart.
+
+
+### Noch ein paar Überlegungen zum Deadlock
+
+Ein Deadlock tritt auf, wenn die Zielgleise aller Wagen, die noch nicht richtig stehen, besetzt sind.
+
+Daraus folgt:
+ - Gleise mit freien Plätzen haben auch im Zielzustand freie Plätze, da ja dort keine Wagen mehr hinzukommen.
+ - Auf den voll-besetzten Gleisen befinden sich nur Wagen, die schon richtig stehen oder auf ein anderes voll-besetztes Gleis versetzt werden sollen. Damit befinden sich auf den vollbesetzten Gleisen insgesamt alle Wagen, die auf voll-besetzte Gleise sollen... folglich kann auf den nicht voll-besetzten Gleisen kein solcher Wagen mehr stehen.
+ - Daraus folgt, dass die nicht voll besetzten Gleise schon vollständig korrekt sortiert sein müssen, wenn der Deadlock entsteht. 
+ - Folglich wird es ausreichen, nur ein paar Wagen von einem voll-besetzten Gleis auf die nicht voll-besetzten Gleise zu verteilen. Dies können wir "Zwischenparken" nennen. Es ist der einzige Rangierschritt, bei dem sich die Anzahl schon korrekt stehender Wagen nicht erhöht. 
+ - Nach dem Zwischenparken werden zumindest ein paar Wagen auf das nun freie Gleis geschoben und ein erneuter Deadlock kann erst entstehen, wenn alle Zwischengeparkten Wagen wieder auf voll-besetzte Gleise gestellt wurden. Folglich gibt es nach jedem Zwischenparken mindestens zwei Rangierschritte (Ausziehen und verteilen aller Wagen eines Gleises)  
+ - Vermutlich ist der Worstcase, wenn Wagen auf vollen Gleisen paarweise vertauscht werden müssen. Generell ist einmal "Zwischenparken" pro Deadlock-Zyklus notwendig, daher ist der worst-case bei der maximalen Anzahl von Zyklen.
+ - In jedem Fall gibt es aber mindestens in zwei Schritte Fortschritt pro "Zwischenparken" (ein Wagen mehr steht auf dem korrekten Zielgleis als vorher), so dass der Algorithmus garantiert immer terminieren wird.
+
+
+### Schriftlich-lautes Nachdenken
+
 
 Falle: dieser Algorithmus ist vielleicht schon nah am Optimum, aber wird in dieser Situation fehl schlagen:
 Limit pro Gleis: 4 Wagen
 Große Buchstaben sind Gleise. Kleine Buchstaben sind Wagen mit Zielgleis.
-A b b b b 
+A b b b b
 B a a a a
-C 
+C
 Optimale Lösung ist alle Wagen von Gleis A oder B auf C zu schieben, dann kann man in zwei weiteren Schritten alle Wagen richtig einsortieren.
 Obiger Algorithmus würde abstürzen, weil er nur von A auf B oder umgekehrt ziehen will.
 
@@ -100,34 +122,34 @@ Man sollte die Algorithmus also abändern: wenn das Zielgleis voll ist, stelle d
 Man kann sich jetzt wieder ein Beispiel ausdenken, bei dem der neue Algorithmus zur Verteilung von bereits richtig gruppierten Wagen führt:
 
 Limit pro Gleis: 6 Wagen, Gesamt-Limit 18 Wagen
-A b b b b 
+A b b b b
 B a b c a b c
-C a a a a 
-D c c c c 
-Dieses Beispiel ist fies, weil alle Zielgleise im Endzustand voll sind. Man muss also zwangsweise viele Wagen auf Gleis D schieben. 
-Und bei Gleis A anzufangen ist besonders schlecht, da Zielgleis B bereits voll ist. 
+C a a a a
+D c c c c
+Dieses Beispiel ist fies, weil alle Zielgleise im Endzustand voll sind. Man muss also zwangsweise viele Wagen auf Gleis D schieben.
+Und bei Gleis A anzufangen ist besonders schlecht, da Zielgleis B bereits voll ist.
 Eine Lösung:
- - Wagen von C auf A und D verteilen.
- - Dann können alle c Wagen von D nach C.
- - Dann alle b Wagen von A nach D schieben.
-Zwischenstand:
-A a a
-B a b c a b c
-C c c c c 
-D a a b b b b
-Dann geht es direkt weiter:
- - Alle Wagen von B können jetzt verteilt werden.
- - Schließlich alle Wagen von D verteilen.
+- Wagen von C auf A und D verteilen.
+- Dann können alle c Wagen von D nach C.
+- Dann alle b Wagen von A nach D schieben.
+  Zwischenstand:
+  A a a
+  B a b c a b c
+  C c c c c
+  D a a b b b b
+  Dann geht es direkt weiter:
+- Alle Wagen von B können jetzt verteilt werden.
+- Schließlich alle Wagen von D verteilen.
 
 Resultat: es wurden nur jene 6 Wagen zwei Mal abgestellt, die im Zwischenzustand in D waren.
 
 Erkenntnis: Wegen der Symmetrie des Beispiels wäre das Vorgehen und der Resultierende Aufwand bei Beginn mit Gleis A der gleiche!
 Besser wäre es, mit Gleis B zu beginnen: dort können tatsächlich alle Wagen direkt verteilt werden.
 Zwischenstand:
-A b b b b a a 
-B b b 
-C a a a a c c 
-D c c c c 
+A b b b b a a
+B b b
+C a a a a c c
+D c c c c
 
 Jetzt kann man im nächsten Schritt die Wagen von Gleis A alle verteilen, dann von Gleis C, dann von Gleis D.
 Resultat: es wurde jeder Wagen nur einmal abgestellt!
@@ -135,38 +157,10 @@ Resultat: es wurde jeder Wagen nur einmal abgestellt!
 In diesem Fall ist also der originale, banale Algorithmus (direkt zum Zielgleis schieben) wieder optimal.
 Also erstmal diesen implementieren und später optimieren.
 
+
 Frage: 
  - Was ist die optimale Reihenfolge, in der Gleise herausgezogen werden? Gibt es immer eine Reihenfolge, bei der jedes Gleis nur einmal gezogen wird?
  - Da man jetzt das Gleis nicht mehr frei machen muss, hat man einen Vorteil, wenn man erstmal mit der Verteilung der "vorderen" Wagen beginnt?
    - Statt Wagen, die auf dem Gleis bleiben sollen, gleich mit heraus zu ziehen, kann man diese Wage erstmal auf dem Gleis belassen und statt sie dann wieder auf dem Gleis abzustellen, erst dann herausziehen, wenn man an die nächsten umzuschiebenden Wagen heran will. Dann sammeln sich quasi die "richtigen" Wagen des aktuellen Arbeitsgleises an der Lok und nicht auf dem Gleis selbst.
      ==> in anderen Worten, statt am Anfang schon sehr viele Wagen an der Lok zu haben, führt das dazu, dass man am Ende sehr viele Wagen an der Lok hat.
-
-
---------------------------------------------------------------------------------------------------------------------------------
-Zweite Idee:
-
-Der Algorithmus kann immer gleich vorgehen, egal ob alle Zielgleise schon frei sind:
- - Markiere alle Zielgleise, die schon frei sind. (= Speichern in einer Variable)
- - Optionale Optimierung: bestimme für jedes Eingangsgleis, welches auch Zielgleis ist, wie viele Wagen von diesem Gleis auf schon freie Gleise (inkl. ihm selbst) gehören. 
-    beginne dann zuerst mit dem Gleis, welches die geringste Anzahl sonstiger Wagen hat. (Weil diese nämlich mehrmals bewegt werden müssen!)
- - Ziehe ein Eingangsgleis leer, welches auch Zielgleis ist. (Oder ein anderes, wenn alle Zielgleise schon "frei" sind.)
-    * Markiere dieses Gleis als "frei".
-    * Verteile die Wagen dieses Gleises auf die Zielgleise, wenn sie dorthin gehören, und sonstige Wagen auf die restlichen Eingangsgleise.
-    * In letzterem Fall bevorzuge Eingangsgleise, an deren Ende schon ein Wagen mit demselben Ziel-Gleis steht.
-
---------------------------------------------------------------------------------------------------------------------------------
-Erste Idee:
-
-1. Räume so viele Ziel-Gleise wie möglich frei, indem Wagen von dort auf anderen Gleisen zusammen gefasst werden.
-    - Falls einige Gleise keine Ziel-Gleise sind, werden Wagen dort bevorzugt hingefahren.
-    - Alle Gleise, auf denen die Wagen dann stehen, nennen wir "Arbeitsgleise".
-    - Am Ende des Prozesses bleiben WG Wagen an der Lok hängen und können direkt im nächsten Schritt verwendet werden.
-    - Wenn alle Zielgleise jetzt schon leer sind, springe direkt zu Schritt 3.
-   
-2. Verteile Wagen auf die bisher freien Zielgleise. 
-   - Ziehe dazu aus den Arbeitsgleisen Teilzüge, an deren freiem Ende sich Wagen befinden, die auf die bisher freien Zielgleise sollen. Wagen, deren Zielgleis noch nicht frei ist, bleiben dabei an der Lok.
-   - Räume dabei zunächst die anderen Zielgleise bevorzugt frei. Dass heißt, sobald die gesamte Anzahl der Wagen auf ein Gleis weniger passt, fasse sie dort zusammen. 
-
-3. Wenn alle Zielgleise frei sind (dass heißt, nur noch Wagen, die dort sein SOLLen, sind auch dort), kann die Verteilung schneller erfolgen:
-    - Alle Wagen werden gesamt aus einem Arbeitsgleis gezogen und die jeweils vorderen auf das richtige Zielgleis abgesetzt.
 
