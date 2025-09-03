@@ -27,7 +27,7 @@ public class Simulator {
 
     Simulator(Tracks given) {
         // deep copy the input value, so we don't mutate it later.
-        currentTracks = Maps.mapValues(given.tracks(), TrackTrains::copy);
+        currentTracks = Maps.mapValuesOnly(given.tracks(), TrackTrains::copy);
     }
 
     private void processPlan(ShuntingPlan plan) {

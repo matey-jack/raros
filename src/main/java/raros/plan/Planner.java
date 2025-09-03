@@ -15,7 +15,7 @@ public class Planner {
         this.given = given;
         this.task = task;
         // deep copy the input value, so we don't mutate it later.
-        this.currentState = Maps.mapValues(given.tracks(), TrackTrains::copy);
+        this.currentState = Maps.mapValuesOnly(given.tracks(), TrackTrains::copy);
         initTargetTracks();
     }
 
@@ -40,19 +40,20 @@ public class Planner {
         List<ShuntingStep> result = new ArrayList<>();
         String currentTrack = getTrackToProcess();
         while (currentTrack != null) {
-            // add one Pick and multiple Drop steps until all cars are distributed or only cars with full target tracks are left.
+            // add one Pick and multiple Drop steps.
             List<String> pickedCars = currentState.get(currentTrack).pickAll();
             // copy the list to an immutable one
             result.add(new Pick(currentTrack, new ArrayList<>(pickedCars)));
             List<String> carsOnLocomotive = pickedCars.reversed();
+            // Cars can be dropped to their target track, or temporarily to a different track (to avoid dead lock).
+            // To avoid doing too much of this temporary dropping, we only drop to tracks which have a free spot
+            // in the target state as well as having a free spot now. (If there is really a deadlock, all free spots
+            // will be of this kind.)
             while (!carsOnLocomotive.isEmpty()) {
-                // if the target track has capacity, move there, otherwise drop it again on the current track
                 String targetTrack = targetTracksByCarId.get(carsOnLocomotive.getLast());
                 String dropTrack = currentState.get(targetTrack).numberOfCars() < task.maxWagonsPerTrack()
                         ? targetTrack
-                        // TODO: das Zwischenparken sollte verhindern, dass man sich einen Platz zupark für den man in derselben
-                        // Fuhre noch einen passen Wagen hat!
-                        : getTrackWithLeastCarsExcept(currentTrack);
+                        : getTemporaryParkingTrack(currentTrack);
                 boolean couple = !currentState.get(dropTrack).trains().isEmpty();
                 List<String> dropCars = List.of(carsOnLocomotive.getLast());
                 result.add(new Drop(dropTrack, new ArrayList<>(dropCars), couple));
@@ -66,11 +67,26 @@ public class Planner {
         return new ShuntingPlan(result);
     }
 
-    String getTrackWithLeastCarsExcept(String exceptTrackId) {
-        // Note that we use the negative to avoid having to program a Maps.min function
-        Map<String, Integer> carsPerTrack = Maps.mapValues(currentState, tt -> -tt.numberOfCars());
-        carsPerTrack.remove(exceptTrackId);
-        return Maps.max(carsPerTrack).get().getKey();
+    String getTemporaryParkingTrack(String defaultTrack) {
+        // We keep cars on the 'defaultTrack' unless there are free spots that are not needed by any more cars.
+        // Note that it's a lot of iteration to calculate this every time we need a temporary parking track.
+        // It would be a useful optimization to keep the "numMissing" value as a state variable on the track,
+        // then 'permanentlyFreeSpots()' could be a simple getting on the track.
+        // (But since introducing new state is error-prone and requires more testing, this is left for later.)
+        var permanentlyFreeSpotsPerTrack = Maps.mapValues(currentState, e -> {
+                    var numCorrect = e.getValue().getAllCars().stream()
+                            .filter(car -> targetTracksByCarId.get(car).equals(e.getKey()))
+                            .count();
+                    var numMissing = task.targetTracks().get(e.getKey()).numberOfCars() - numCorrect;
+                    var numFree = task.maxWagonsPerTrack() - e.getValue().numberOfCars();
+                    return numFree - numMissing;
+                }
+        );
+        var maxFreeSpots = Maps.max(permanentlyFreeSpotsPerTrack).get();
+        if (maxFreeSpots.getValue() > 0) {
+            return maxFreeSpots.getKey();
+        }
+        return defaultTrack;
     }
 
     /***
@@ -151,7 +167,7 @@ public class Planner {
     }
 
     Map<String, Integer> getCapacityPerTrack() {
-        return Maps.mapValues(currentState, tt -> task.maxWagonsPerTrack() - tt.numberOfCars());
+        return Maps.mapValuesOnly(currentState, tt -> task.maxWagonsPerTrack() - tt.numberOfCars());
     }
 
     /***
