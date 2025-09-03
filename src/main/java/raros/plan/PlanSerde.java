@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.File;
+import java.nio.file.Path;
 
 // Serializer/Deserializer = writing and reading Json from the in-program data structures.
 public class PlanSerde {
@@ -13,9 +14,9 @@ public class PlanSerde {
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
-    <T> T read(String filename, Class<T> dataClass) {
+    <T> T read(Path path, Class<T> dataClass) {
         try {
-            var envelope = objectMapper.readValue(new File(filename), Envelope.class);
+            var envelope = objectMapper.readValue(path.toFile(), Envelope.class);
             Class foundClass = RarosDataType.getClassFor(envelope.datatype());
             if (foundClass == null) {
                 throw new RuntimeException(
@@ -35,21 +36,21 @@ public class PlanSerde {
         }
     }
 
-    public void write(ShuntingPlan plan, String pathName) {
+    public void write(ShuntingPlan plan, Path pathName) {
         var payload = objectMapper.valueToTree(plan);
         var envelope = new Envelope(RarosDataType.SHUNTING_PLAN.value, "beta-1", payload);
         write(envelope, pathName);
     }
 
-    public void write(Tracks state, String pathName) {
+    public void write(Tracks state, Path pathName) {
         var payload = objectMapper.valueToTree(state);
         var envelope = new Envelope(RarosDataType.YARD_TRACKS_CAR_ORDER_GIVEN.value, "beta-1", payload);
         write(envelope, pathName);
     }
 
-    private void write(Envelope envelope, String pathName) {
+    private void write(Envelope envelope, Path pathName) {
         try {
-            objectMapper.writeValue(new File(pathName), envelope);
+            objectMapper.writeValue(pathName.toFile(), envelope);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

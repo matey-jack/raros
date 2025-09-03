@@ -43,21 +43,23 @@ class PlannerTest {
 
     @Test
     void testPlanAndValidate() {
-        var given = serde.read("src/test/resources/simple/given.json", Tracks.class);
-        var target = serde.read("src/test/resources/simple/target.json", ShuntingTask.class);
+        var folderPath = Paths.get("src/test/resources/simple/");
+        var given = serde.read(folderPath.resolve("given.json"), Tracks.class);
+        var target = serde.read(folderPath.resolve("target.json"), ShuntingTask.class);
         new Planner(given, target).createPlan();
     }
 
     void testFolder(String folderName) {
-        var given = serde.read("src/test/resources/" + folderName + "/given.json", Tracks.class);
-        var target = serde.read("src/test/resources/" + folderName + "/target.json", ShuntingTask.class);
-//        var expectedPlan = serde.read("src/test/resources/" + folderName + "/shunting-plan.json", ShuntingPlan.class);
+        var folderPath = Paths.get("src/test/resources/").resolve(folderName);
+        var given = serde.read(folderPath.resolve("given.json"), Tracks.class);
+        var target = serde.read(folderPath.resolve("target.json"), ShuntingTask.class);
+//        var expectedPlan = serde.read(folderPath.resolve("shunting-plan.json"), ShuntingPlan.class);
 
         var actualPlan = new Planner(given, target).createPlan();
-        serde.write(actualPlan, "src/test/resources/" + folderName + "/generated-plan.json");
+        serde.write(actualPlan, folderPath.resolve("generated-plan.json"));
 
         var result = Simulator.simulate(given, actualPlan);
-        serde.write(result, "src/test/resources/" + folderName + "/generated-result.json");
+        serde.write(result, folderPath.resolve("generated-result.json"));
 
         var report = Validator.checkResult(result, target);
         for (var line : report) {
@@ -104,11 +106,38 @@ class PlannerTest {
                         "50", track(train(50))
                 ));
         var result = new Planner(given, task).planAndValidate();
-        Path targetDir = Paths.get("src/test/resources/degenerate");
+        Path targetDir = Paths.get("src/test/resources/degenerate/");
         if (!Files.exists(targetDir)) {
             Files.createDirectory(targetDir);
         }
-        serde.write(result.plan(), "src/test/resources/degenerate/generated-plan.json");
-        serde.write(result.resultingTracks(), "src/test/resources/degenerate/generated-result.json");
+        serde.write(result.plan(), targetDir.resolve("generated-plan.json"));
+        serde.write(result.resultingTracks(), targetDir.resolve("generated-result.json"));
+    }
+
+    @Test
+    void testDeadLock() throws IOException {
+        var given = new Tracks(Map.of(
+                "10", track(train(2)),
+                "20", track(train(1)),
+                "30", track(train(4)),
+                "40", track(train(3)),
+                "50", track()
+        ));
+        var task = new ShuntingTask(
+                1,
+                Map.of(
+                        "10", track(train(1)),
+                        "20", track(train(2)),
+                        "30", track(train(3)),
+                        "40", track(train(4)),
+                        "50", track()
+                ));
+        var result = new Planner(given, task).planAndValidate();
+        Path targetDir = Paths.get("src/test/resources/deadlock");
+        if (!Files.exists(targetDir)) {
+            Files.createDirectory(targetDir);
+        }
+        serde.write(result.plan(), targetDir.resolve("generated-plan.json"));
+        serde.write(result.resultingTracks(), targetDir.resolve("generated-result.json"));
     }
 }
