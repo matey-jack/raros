@@ -2,14 +2,12 @@ package raros;
 
 import de.tuberlin.bbi.dr.LayoutController;
 import de.tuberlin.bbi.dr.TrackSection;
-import de.tuberlin.bbi.dr.Turnout;
 import de.tuberlin.bbi.dr.Vehicle;
+import raros.drive.Infrastruktur_SG;
 
 import static de.tuberlin.bbi.dr.Turnout.Position.CLOSED;
-import static de.tuberlin.bbi.dr.Turnout.Position.THROWN;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;

@@ -1,5 +1,6 @@
 plugins {
-    id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
 }
 
 group = "robertw"
@@ -9,6 +10,15 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(24)
     }
+}
+
+application {
+    // mainModule.set("demo.ui")
+    mainClass.set("raros.ui.Main")
+}
+
+javafx {
+    modules = [ 'javafx.controls' ] // , 'javafx.fxml'
 }
 
 repositories {
@@ -22,6 +32,9 @@ repositories {
 dependencies {
     implementation('de.tuberlin.bbi:drControl:1.1.0')
     implementation('com.fasterxml.jackson.core:jackson-databind:2.19.2')
+    implementation("org.openjfx:javafx-controls:17:win")
+    implementation("org.openjfx:javafx-graphics:17:win")
+
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation('org.junit.jupiter:junit-jupiter')
     testRuntimeOnly('org.junit.platform:junit-platform-launcher')
