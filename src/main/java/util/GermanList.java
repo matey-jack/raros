@@ -10,7 +10,6 @@ public class GermanList {
         if (list.size() == 1) {
             return list.getFirst();
         }
-        String last = list.removeLast();
-        return String.join(", ", list) + " und " + last;
+        return String.join(", ", list.subList(0, list.size() - 1)) + " und " + list.getLast();
     }
 }
