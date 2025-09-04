@@ -23,6 +23,6 @@ public class LocomotiveDriver {
 
         System.out.println("ENTER drücken, um anzuhalten.");
         System.console().readLine();
-
+        vehicle.setSpeedStep(0);
     }
 }
