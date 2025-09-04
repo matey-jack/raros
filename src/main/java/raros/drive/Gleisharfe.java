@@ -56,11 +56,11 @@ public abstract class Gleisharfe {
                         awaitedPoints.add(Integer.toString(point.turnoutId()));
                     }
                 }
+                if (awaitedPoints.isEmpty()) return true;
                 System.out.println(
                         "Warten auf Endstellung der Weichen " + GermanList.join(awaitedPoints) + "."
                 );
-            } while (!awaitedPoints.isEmpty());
-            return true;
+            } while (true);
         } catch (InterruptedException e) {
             return false;
         }

@@ -4,6 +4,10 @@ import de.tuberlin.bbi.dr.ConfiguredConnection;
 import de.tuberlin.bbi.dr.LayoutController;
 import de.tuberlin.bbi.dr.TrackSection;
 import de.tuberlin.bbi.dr.Vehicle;
+import de.tuberlin.bbi.dr.impl.BaseDeviceImpl;
+import loconet.LocoNetHandler;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import raros.drive.Infrastruktur_SG;
 
 import static de.tuberlin.bbi.dr.Turnout.Position.CLOSED;
@@ -23,6 +27,12 @@ public class Main {
     }
 
     public static ConfiguredConnection configureController() {
+
+//        Logger.getLogger(BaseDeviceImpl.class).setLevel(Level.INFO);
+//        Logger.getLogger(LayoutController.class).setLevel(Level.INFO);
+//        Logger.getLogger("de.tuberlin.bbi.dr").setLevel(Level.INFO);
+//        Logger.getLogger(LocoNetHandler.class).setLevel(Level.INFO);
+
         Properties properties = new Properties();
         properties.put("lbserver.ip", "192.168.188.47");
         properties.put("lbserver.port", "1234");
@@ -32,11 +42,13 @@ public class Main {
 
     public static void main(String[] args) {
         var conn = configureController();
-        LayoutController.addTrackSectionStateListener(Main::logTrackState);
-        //lokTest();
-        logAllTrackStates();
+        if (conn.getHandler().isConnected()) {
+            LayoutController.addTrackSectionStateListener(Main::logTrackState);
+            //lokTest();
+            logAllTrackStates();
 
-        sleepSeconds(2);
+            sleepSeconds(2);
+        }
         conn.getHandler().close();
     }
 

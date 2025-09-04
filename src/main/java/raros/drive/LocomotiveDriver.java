@@ -15,13 +15,13 @@ public class LocomotiveDriver {
      */
     void drive(boolean toGleisharfe) {
         String direction = toGleisharfe ? "in die Gleisharfe zu fahren." : "ins Ausziehgleis zurück zu setzen.";
-        System.out.println("ENTER drücken, um " + direction);
+        System.out.print("ENTER drücken, um " + direction);
         System.console().readLine();
 
         vehicle.setDirection(toGleisharfe ? Vehicle.Direction.NORMAL : Vehicle.Direction.REVERSE);
         vehicle.setSpeedStep(DEFAULT_SPEED);
 
-        System.out.println("ENTER drücken, um anzuhalten.");
+        System.out.print("ENTER drücken, um anzuhalten.");
         System.console().readLine();
         vehicle.setSpeedStep(0);
     }

@@ -56,6 +56,9 @@ public class Infrastruktur_SG {
         public boolean initialize() {
             var w14 = LayoutController.turnoutByAddress(W14);
             w14.setPosition(Position.THROWN);
+            // hilfsweise so herum initialisieren, weil scheinbar der Zustand falsch angezeigt wird,
+            // so dass die Weiche nie automatisch umgestellt wird.
+            LayoutController.turnoutByAddress(W11).setPosition(Position.THROWN);
             return true;
         }
     };
