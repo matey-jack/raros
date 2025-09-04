@@ -84,7 +84,7 @@ class PlannerTest {
     }
 
     /**
-     * This example shows that the first move is really stupid,
+     * This example shows that the first move is really stupid (in the old version, not any more),
      * but after that, the plan is puts at least one additional car on the target track for every Pick.
      */
     @Test

@@ -6,16 +6,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// TODO: split this into a pure data class with immutable list of train (of immutable list of cars),
+//       and a "smart" class which has all the helper methods for planning (as well as extra state for the permanently free spots).
 public record TrackTrains(
         List<Train> trains
 ) {
     public int numberOfCars() {
-        return trains().stream().mapToInt(Train::size).sum();
+        return trains.stream().mapToInt(Train::size).sum();
     }
 
     public TrackTrains copy() {
         return new TrackTrains(
-                trains().stream()
+                trains.stream()
                         .map(Train::copy)
                         .collect(Collectors.toCollection(ArrayList::new))
         );
@@ -36,7 +38,7 @@ public record TrackTrains(
      */
     public List<String> pickAll() {
         var result = getAllCars();
-        trains().clear();
+        trains.clear();
         return result;
     }
 
@@ -45,8 +47,8 @@ public record TrackTrains(
      */
     public void addCars(List<String> cars, boolean couple) {
         if (!couple) {
-            trains().add(new Train());
+            trains.add(new Train());
         }
-        trains().getLast().carIds().addAll(cars);
+        trains.getLast().carIds().addAll(cars);
     }
 }
