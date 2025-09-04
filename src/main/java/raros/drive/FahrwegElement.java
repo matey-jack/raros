@@ -6,4 +6,7 @@ public record FahrwegElement(
         int turnoutId,
         Position turnoutPosition
 ) {
+    public String positionText() {
+        return turnoutPosition == Position.THROWN ? "abbiegend" : "gerade";
+    }
 }

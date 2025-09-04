@@ -1,7 +1,10 @@
 package raros.drive;
 
 import de.tuberlin.bbi.dr.LayoutController;
+import de.tuberlin.bbi.dr.Turnout;
+import util.GermanList;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,16 +32,26 @@ public abstract class Gleisharfe {
     public boolean setFahrwegToTrack(int trackId) {
         var points = fahrwegKonfiguration.get(trackId);
         for (FahrwegElement point : points) {
-            LayoutController.turnoutByAddress(point.turnoutId())
-                    .setPosition(point.turnoutPosition());
+            Turnout t = LayoutController.turnoutByAddress(point.turnoutId());
+            if (t.getPosition() != point.turnoutPosition()) {
+                t.setPosition(point.turnoutPosition());
+            }
         }
         try {
-            TimeUnit.SECONDS.sleep(1);
-            for (FahrwegElement point : points) {
-                if (LayoutController.turnoutByAddress(point.turnoutId()).getPosition() != point.turnoutPosition()) {
-                    TimeUnit.SECONDS.sleep(1);
+            List<String> awaitedPoints;
+            do {
+                TimeUnit.SECONDS.sleep(1);
+                awaitedPoints = new ArrayList<>();
+                for (FahrwegElement point : points) {
+                    if (LayoutController.turnoutByAddress(point.turnoutId()).getPosition() != point.turnoutPosition()) {
+                        awaitedPoints.add(Integer.toString(point.turnoutId()));
+                        System.out.println("Stelle Weiche " + point.turnoutId() + " auf '" + point.positionText() + "'.");
+                    }
                 }
-            }
+                System.out.println(
+                        "Warten auf Endstellung der Weichen " + GermanList.join(awaitedPoints) + "."
+                );
+            } while (!awaitedPoints.isEmpty());
             return true;
         } catch (InterruptedException e) {
             return false;

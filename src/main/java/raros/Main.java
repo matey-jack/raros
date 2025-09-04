@@ -1,5 +1,6 @@
 package raros;
 
+import de.tuberlin.bbi.dr.ConfiguredConnection;
 import de.tuberlin.bbi.dr.LayoutController;
 import de.tuberlin.bbi.dr.TrackSection;
 import de.tuberlin.bbi.dr.Vehicle;
@@ -21,12 +22,16 @@ public class Main {
         System.out.println("Track " + track + " is now " + state.toString() + ".");
     }
 
-    public static void main(String[] args) {
+    public static ConfiguredConnection configureController() {
         Properties properties = new Properties();
         properties.put("lbserver.ip", "192.168.188.47");
         properties.put("lbserver.port", "1234");
 
-        var conn = LayoutController.configureAndSetConnection(properties);
+        return LayoutController.configureAndSetConnection(properties);
+    }
+
+    public static void main(String[] args) {
+        var conn = configureController();
         LayoutController.addTrackSectionStateListener(Main::logTrackState);
         //lokTest();
         logAllTrackStates();
@@ -80,7 +85,6 @@ public class Main {
         Vehicle vehicle = LayoutController.vehicleByAddress(BLAUE_LOK);
         vehicle.setDirection(Vehicle.Direction.NORMAL);
         vehicle.setSpeedStep(96);
-        System.console().readLine();
         var elapsed = System.currentTimeMillis() - start;
         vehicle.setSpeedStep(0);
         System.out.println("Elapsed time in milli-seconds " + elapsed);
@@ -109,7 +113,7 @@ public class Main {
     }
 
 
-    static void sleepSeconds(int secs) {
+    public static void sleepSeconds(int secs) {
         if (secs < 0) return;
         var trackSection = LayoutController.trackSectionByAddress(Infrastruktur_SG.MIDDLE_TRACK_SECTION);
         var oldState = trackSection.getTrackSectionState();
