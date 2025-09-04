@@ -4,17 +4,25 @@ import de.tuberlin.bbi.dr.LayoutController;
 import de.tuberlin.bbi.dr.Turnout;
 import util.GermanList;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public abstract class Gleisharfe {
-    Map<Integer, Set<FahrwegElement>> fahrwegKonfiguration;
+    final Map<Integer, Set<FahrwegElement>> fahrwegKonfiguration;
 
     public Gleisharfe(Map<Integer, Set<FahrwegElement>> fahrwegKonfiguration) {
         this.fahrwegKonfiguration = fahrwegKonfiguration;
+    }
+
+    public boolean validateTracks(Collection<String> tracks) {
+        boolean valid = true;
+        for (var track : tracks) {
+            if (!fahrwegKonfiguration.containsKey(Integer.parseInt(track))) {
+                System.out.println("Gleis " + track + " existiert nicht in der Infrastruktur.");
+                valid = false;
+            }
+        }
+        return valid;
     }
 
     public List<Integer> getAllTrackIds() {
@@ -34,6 +42,7 @@ public abstract class Gleisharfe {
         for (FahrwegElement point : points) {
             Turnout t = LayoutController.turnoutByAddress(point.turnoutId());
             if (t.getPosition() != point.turnoutPosition()) {
+                System.out.println("Stelle Weiche " + point.turnoutId() + " auf '" + point.positionText() + "'.");
                 t.setPosition(point.turnoutPosition());
             }
         }
@@ -45,7 +54,6 @@ public abstract class Gleisharfe {
                 for (FahrwegElement point : points) {
                     if (LayoutController.turnoutByAddress(point.turnoutId()).getPosition() != point.turnoutPosition()) {
                         awaitedPoints.add(Integer.toString(point.turnoutId()));
-                        System.out.println("Stelle Weiche " + point.turnoutId() + " auf '" + point.positionText() + "'.");
                     }
                 }
                 System.out.println(

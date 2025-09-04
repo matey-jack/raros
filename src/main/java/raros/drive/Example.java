@@ -14,18 +14,21 @@ import static raros.drive.Infrastruktur_SG.RechteSeite;
 
 public class Example {
     final static ShuntingPlan plan = new ShuntingPlan(List.of(
-            new Pick("1", List.of("a", "b")),
+            new Pick("3", List.of("a", "b")),
             new Drop("2", List.of("b"), false),
-            new Drop("1", List.of("a"), false)
+            new Drop("3", List.of("a"), false)
     ));
 
     public static void main(String[] args) {
         var conn = configureController();
         final LocomotiveDriver loco = new LocomotiveDriver(LayoutController.vehicleByAddress(ROTE_LOK));
         Gleisharfe infrastruktur = RechteSeite;
-
+        if (!infrastruktur.validateTracks(plan.getUsedTracks())) {
+            System.out.println("Rangier-Plan nicht ausführbar.");
+            return;
+        }
         for (var step: plan.steps()) {
-            infrastruktur.setFahrwegToTrack(Integer.parseInt(step.track()));
+            //infrastruktur.setFahrwegToTrack(Integer.parseInt(step.track()));
             loco.drive(true);
             doTheCoupling(step);
             loco.drive(false);
