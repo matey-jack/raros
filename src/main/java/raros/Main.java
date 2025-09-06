@@ -41,15 +41,19 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        var conn = configureController();
-        if (conn.getHandler().isConnected()) {
-            LayoutController.addTrackSectionStateListener(Main::logTrackState);
-            //lokTest();
-            logAllTrackStates();
+        ConfiguredConnection conn = null;
+        try {
+            conn = configureController();
+            if (conn.getHandler().isConnected()) {
+                LayoutController.addTrackSectionStateListener(Main::logTrackState);
+                //lokTest();
+                logAllTrackStates();
 
-            sleepSeconds(2);
+                sleepSeconds(2);
+            }
+        } finally {
+            if (conn != null) conn.getHandler().close();
         }
-        conn.getHandler().close();
     }
 
     private static void logAllTrackStates() {

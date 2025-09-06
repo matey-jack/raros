@@ -1,5 +1,6 @@
 package raros.drive;
 
+import de.tuberlin.bbi.dr.ConfiguredConnection;
 import de.tuberlin.bbi.dr.LayoutController;
 import raros.plan.Drop;
 import raros.plan.Pick;
@@ -21,11 +22,15 @@ public class Example {
     ));
 
     public static void main(String[] args) throws InterruptedException {
-        var conn = configureController();
-        if (conn.getHandler().isConnected()) {
-            shuntingMain();
+        ConfiguredConnection conn = null;
+        try {
+            conn = configureController();
+            if (conn.getHandler().isConnected()) {
+                shuntingMain();
+            }
+        } finally {
+            if (conn != null) conn.getHandler().close();
         }
-        conn.getHandler().close();
     }
 
     private static void shuntingMain() throws InterruptedException {
