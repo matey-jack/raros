@@ -7,7 +7,7 @@ public class ShuntingUiState {
     final ShuntingPlan plan;
     final int totalSteps;
 
-    ShuntingState state = ShuntingState.DRIVING_IN;
+    ShuntingState state = ShuntingState.SWITCHING_POINTS;
     ShuntingStep currentStep = null;
     int stepNumber = 0;
 

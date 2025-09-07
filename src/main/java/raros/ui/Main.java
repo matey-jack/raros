@@ -16,12 +16,16 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import raros.drive.Driver;
 import raros.drive.Example;
+import raros.drive.Gleisharfe;
+import raros.drive.Switcher;
 
 import static raros.Main.ROTE_LOK;
 import static raros.Main.configureController;
+import static raros.drive.Infrastruktur_SG.RechteSeite;
 
 public class Main extends Application {
-    ShuntingUiState state = new ShuntingUiState(Example.plan);
+    final ShuntingUiState state = new ShuntingUiState(Example.plan);
+    final Gleisharfe infrastruktur = RechteSeite;
 
     final Label topStatus = new Label();
     final VBox root = new VBox();
@@ -32,6 +36,7 @@ public class Main extends Application {
 
     ConfiguredConnection conn = null;
     Driver driver = new Driver();
+    Switcher switcher = new Switcher(infrastruktur);
 
     public static void main(String[] args) {
         launch(args);
@@ -46,6 +51,7 @@ public class Main extends Application {
             return;
         }
         driver.setVehicle(LayoutController.vehicleByAddress(ROTE_LOK));
+        switcher.setRealRun();
     }
 
     @Override
@@ -87,8 +93,8 @@ public class Main extends Application {
     private void firstStep() {
         setProgress();
         root.getChildren().removeLast();
-        root.getChildren().addAll(topStatus, drivingControls.root);
-        drivingControls.setDirection(state.state);
+        switcher.switchTo(state.currentStep.track(), switchControls::setSwitchStatus, switchControls::done);
+        root.getChildren().addAll(topStatus, switchControls.root);
     }
 
     public void setProgress() {
@@ -114,8 +120,8 @@ public class Main extends Application {
                 root.getChildren().add(drivingControls.root);
             }
             case SWITCHING_POINTS -> {
-                // TODO: actually wait for the switches in another thread!?
-                switchControls.done();
+                switchControls.reset();
+                switcher.switchTo(state.currentStep.track(), switchControls::setSwitchStatus, switchControls::done);
                 root.getChildren().add(switchControls.root);
             }
         }

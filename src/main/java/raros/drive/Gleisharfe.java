@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public abstract class Gleisharfe {
-    final Map<Integer, Set<FahrwegElement>> fahrwegKonfiguration;
+    public final Map<Integer, Set<FahrwegElement>> fahrwegKonfiguration;
 
     public Gleisharfe(Map<Integer, Set<FahrwegElement>> fahrwegKonfiguration) {
         this.fahrwegKonfiguration = fahrwegKonfiguration;

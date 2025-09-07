@@ -5,20 +5,28 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
+import java.util.List;
+
 public class SwitchControls {
     final Runnable next;
-    final private Label statusLabel = new Label("Weichen werden umgestellt.");
-    final private Button confirmButton = new Button("Bitte Warten.");
+    final private Label statusLabel = new Label();
+    final private Button confirmButton = new Button();
     final public Pane root = new VBox(statusLabel, confirmButton);
 
     SwitchControls(Runnable next) {
         this.next = next;
-        confirmButton.setDisable(true);
         confirmButton.setOnAction(e -> next.run());
+        reset();
     }
 
-    public void setSwitchStatus(String status) {
-        statusLabel.setText(status);
+    void reset() {
+        statusLabel.setText("Weichen werden umgestellt.");
+        confirmButton.setText("Bitte Warten.");
+        confirmButton.setDisable(true);
+    }
+
+    public void setSwitchStatus(List<String> status) {
+        statusLabel.setText(String.join("\n",status));
     }
 
     public void done() {
