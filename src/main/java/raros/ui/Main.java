@@ -1,5 +1,7 @@
 package raros.ui;
 
+import de.tuberlin.bbi.dr.ConfiguredConnection;
+import de.tuberlin.bbi.dr.LayoutController;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
@@ -9,33 +11,114 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import raros.drive.Driver;
+import raros.drive.Example;
+
+import static raros.Main.ROTE_LOK;
+import static raros.Main.configureController;
 
 public class Main extends Application {
+    ShuntingUiState state = new ShuntingUiState(Example.plan);
+
     final Label topStatus = new Label();
-    final VBox root = new VBox(topStatus);
+    final VBox root = new VBox();
+    Scene scene;
     DrivingControls drivingControls;
-    ShuntingUiState exampleState = new ShuntingUiState(
-            ShuntingState.DRIVING_IN,
-            null,
-            1,
-            10
-    );
+    CouplingControls couplingControls;
+    SwitchControls switchControls;
+
+    ConfiguredConnection conn = null;
+    Driver driver = new Driver();
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    public void connect() {
+        conn = configureController();
+        System.out.println(conn.getInfo());
+        if (!conn.getHandler().isConnected()) {
+            System.out.println("Connection to LocoNet failed!");
+            conn = null;
+            return;
+        }
+        driver.setVehicle(LayoutController.vehicleByAddress(ROTE_LOK));
+    }
 
     @Override
     public void start(Stage stage) {
-        drivingControls = new DrivingControls();
-        root.getChildren().addAll(drivingControls.root);
+        drivingControls = new DrivingControls(driver, this::next);
+        couplingControls = new CouplingControls(driver, this::next);
+        switchControls = new SwitchControls(this::next);
+
         stage.setTitle("RaRoS Steuerung für Rangierbegleiter");
-        stage.setScene(new Scene(root, 420, 300));
+
+        root.getChildren().add(createInitScreen());
+        scene = new Scene(root, 420, 300);
+        stage.setScene(scene);
         stage.show();
-        setState(exampleState);
     }
 
-    public void setState(ShuntingUiState state) {
-        topStatus.setText("Rangierschritt " + state.stepNumber() + " von " + state.totalSteps() + ".");
-        drivingControls.setDirection(state.state());
+    @Override
+    public void stop() throws Exception {
+        if (conn != null) {
+            driver.stop();
+            conn.getHandler().close();
+        }
+        super.stop();
+    }
+
+    private Pane createInitScreen() {
+        Button connectButton = new Button("Verbinden mit LokoNet");
+        connectButton.setOnAction(e -> {
+            connect();
+            firstStep();
+        });
+
+        Button dryRunButton = new Button("Testbetrieb ohne LocoNet");
+        dryRunButton.setOnAction(e -> firstStep());
+
+        return new VBox(connectButton, dryRunButton);
+    }
+
+    private void firstStep() {
+        setProgress();
+        root.getChildren().removeLast();
+        root.getChildren().addAll(topStatus, drivingControls.root);
+        drivingControls.setDirection(state.state);
+    }
+
+    public void setProgress() {
+        topStatus.setText("Rangierschritt " + (state.stepNumber + 1) + " von " + state.totalSteps + ".");
+    }
+
+    public void next() {
+        root.getChildren().removeLast();
+        state.next();
+        setProgress();
+        if (state.done()) {
+            root.getChildren().clear();
+            root.getChildren().add(new Label("Rangierplan abgeschlossen!"));
+            return;
+        }
+        switch (state.state) {
+            case COUPLING -> {
+                couplingControls.setStep(state.currentStep);
+                root.getChildren().add(couplingControls.root);
+            }
+            case DRIVING_OUT, DRIVING_IN -> {
+                drivingControls.setDirection(state.state);
+                root.getChildren().add(drivingControls.root);
+            }
+            case SWITCHING_POINTS -> {
+                // TODO: actually wait for the switches in another thread!?
+                switchControls.done();
+                root.getChildren().add(switchControls.root);
+            }
+        }
     }
 
     public void startGPT(Stage stage) {
@@ -96,10 +179,6 @@ public class Main extends Application {
         stage.setTitle("My JavaFX Window");
         stage.setScene(new Scene(root, 420, 300));
         stage.show();
-    }
-
-    public static void main(String[] args) {
-        launch(args);
     }
 
 }

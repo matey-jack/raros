@@ -15,8 +15,8 @@ import static raros.Main.*;
 import static raros.drive.Infrastruktur_SG.RechteSeite;
 
 public class Example {
-    final static ShuntingPlan plan = new ShuntingPlan(List.of(
-            // new Pick("3", List.of("a", "b")),
+    public final static ShuntingPlan plan = new ShuntingPlan(List.of(
+            new Pick("3", List.of("a", "b")),
             new Drop("2", List.of("b"), false),
             new Drop("3", List.of("a"), false)
     ));
