@@ -59,13 +59,7 @@ public class Switcher {
         return switches.stream().map(Switch::toString).toList();
     }
 
-    class FakeTurnout implements Turnout {
-        final Turnout.Position position;
-
-        FakeTurnout(Turnout.Position position) {
-            this.position = position;
-        }
-
+    record FakeTurnout(Position position) implements Turnout {
         @Override
         public Turnout setPosition(Position position) {
             return this;

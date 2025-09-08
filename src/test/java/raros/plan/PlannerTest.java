@@ -12,7 +12,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PlannerTest {
-    PlanSerde serde = new PlanSerde();
+    final PlanSerde serde = new PlanSerde();
 
     TrackTrains track(Train... trains) {
         return new TrackTrains(Arrays.asList(trains));

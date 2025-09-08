@@ -35,8 +35,8 @@ public class Main extends Application {
     SwitchControls switchControls;
 
     ConfiguredConnection conn = null;
-    Driver driver = new Driver();
-    Switcher switcher = new Switcher(infrastruktur);
+    final Driver driver = new Driver();
+    final Switcher switcher = new Switcher(infrastruktur);
 
     public static void main(String[] args) {
         launch(args);

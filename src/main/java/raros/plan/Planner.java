@@ -95,7 +95,7 @@ public class Planner {
      */
     void compressPlan(List<ShuntingStep> plan) {
         var i = 0;
-        // it has to be a while loop, because we progress either be advancing the index or shorteing the list.
+        // it has to be a while loop, because we progress either by advancing the index or shortening the list.
         while (i < plan.size() - 1) {
             ShuntingStep first = plan.get(i);
             ShuntingStep second = plan.get(i + 1);

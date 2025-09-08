@@ -13,10 +13,10 @@ public class Infrastruktur_SG {
     private static final int W3 = 383;
     private static final int W4 = 382;
 
-    public static List<Integer> allTrackSections = List.of(34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48);
-    public static int MIDDLE_TRACK_SECTION = 40;
+    public static final List<Integer> allTrackSections = List.of(34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48);
+    public static final int MIDDLE_TRACK_SECTION = 40;
 
-    public static Gleisharfe LinkeSeite = new Gleisharfe(Map.of(
+    public static final Gleisharfe LinkeSeite = new Gleisharfe(Map.of(
             1, Set.of(new FahrwegElement(W1, Position.CLOSED)),
             2, Set.of(
                     new FahrwegElement(W1, Position.THROWN),
@@ -37,7 +37,7 @@ public class Infrastruktur_SG {
     public static final int W13 = 379;
     private static final int W14 = 371;
 
-    public static Gleisharfe RechteSeite = new Gleisharfe(Map.of(
+    public static final Gleisharfe RechteSeite = new Gleisharfe(Map.of(
             2, Set.of(
                     new FahrwegElement(W11, Position.THROWN),
                     new FahrwegElement(W12, Position.CLOSED)
@@ -57,7 +57,7 @@ public class Infrastruktur_SG {
             var w14 = LayoutController.turnoutByAddress(W14);
             w14.setPosition(Position.THROWN);
             // hilfsweise so herum initialisieren, weil scheinbar der Zustand falsch angezeigt wird,
-            // so dass die Weiche nie automatisch umgestellt wird.
+            // sodass die Weiche nie automatisch umgestellt wird.
             LayoutController.turnoutByAddress(W11).setPosition(Position.THROWN);
             return true;
         }

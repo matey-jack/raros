@@ -4,10 +4,6 @@ import de.tuberlin.bbi.dr.ConfiguredConnection;
 import de.tuberlin.bbi.dr.LayoutController;
 import de.tuberlin.bbi.dr.TrackSection;
 import de.tuberlin.bbi.dr.Vehicle;
-import de.tuberlin.bbi.dr.impl.BaseDeviceImpl;
-import loconet.LocoNetHandler;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import raros.drive.Infrastruktur_SG;
 
 import static de.tuberlin.bbi.dr.Turnout.Position.CLOSED;
@@ -19,8 +15,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Main {
-    public static int ROTE_LOK = 6;
-    public static int BLAUE_LOK = 7;
+    public static final int ROTE_LOK = 6;
+    public static final int BLAUE_LOK = 7;
 
     static void logTrackState(int track, TrackSection.State state) {
         System.out.println("Track " + track + " is now " + state.toString() + ".");

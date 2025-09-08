@@ -59,7 +59,7 @@ TODO: Kuppeln von Wagen auf dem Zielgleis:
 c – Beschränkung der Funktionalität
 -----------------------------------
 
-Rangieren mit dem besten Durchsatz wird ja bekanntlich über einen Ablaufberg gemacht, so dass jeder Wagen von seinem Ankunftszug zu seinem Ziel-Gleis rollt. (Nur wenn demnächst kein Zug für diesen Wagen fährt, muss er ggf. später nochmal ablaufen.)
+Rangieren mit dem besten Durchsatz wird ja bekanntlich über einen Ablaufberg gemacht, sodass jeder Wagen von seinem Ankunftszug zu seinem Ziel-Gleis rollt. (Nur wenn demnächst kein Zug für diesen Wagen fährt, muss er ggf. später nochmal ablaufen.)
 
 Wenn man hingegen auf nur einer Gleisharfe rangiert und dort beliebige IST und SOLL Kombinationen von Wagenpositionen erlaubt, 
 dann kann es passieren, dass zur Herstellung des Zielzustands Wägen mehrmals bewegt werden müssen, wobei der Personalaufwand schnell unbezahlbar wird. 
@@ -102,8 +102,8 @@ Daraus folgt:
  - Daraus folgt, dass die nicht voll besetzten Gleise schon vollständig korrekt sortiert sein müssen, wenn der Deadlock entsteht. 
  - Folglich wird es ausreichen, nur ein paar Wagen von einem voll-besetzten Gleis auf die nicht voll-besetzten Gleise zu verteilen. Dies können wir "Zwischenparken" nennen. Es ist der einzige Rangierschritt, bei dem sich die Anzahl schon korrekt stehender Wagen nicht erhöht. 
  - Nach dem Zwischenparken werden zumindest ein paar Wagen auf das nun freie Gleis geschoben und ein erneuter Deadlock kann erst entstehen, wenn alle Zwischengeparkten Wagen wieder auf voll-besetzte Gleise gestellt wurden. Folglich gibt es nach jedem Zwischenparken mindestens zwei Rangierschritte (Ausziehen und verteilen aller Wagen eines Gleises)  
- - Vermutlich ist der Worstcase, wenn Wagen auf vollen Gleisen paarweise vertauscht werden müssen. Generell ist einmal "Zwischenparken" pro Deadlock-Zyklus notwendig, daher ist der worst-case bei der maximalen Anzahl von Zyklen.
- - In jedem Fall gibt es aber mindestens in zwei Schritte Fortschritt pro "Zwischenparken" (ein Wagen mehr steht auf dem korrekten Zielgleis als vorher), so dass der Algorithmus garantiert immer terminieren wird.
+ - Vermutlich ist der Worstcase, wenn Wagen auf vollen Gleisen paarweise vertauscht werden müssen. Generell ist einmal "Zwischenparken" pro Deadlock-Zyklus notwendig, daher ist der Worstcase bei der maximalen Anzahl von Zyklen.
+ - In jedem Fall gibt es aber mindestens in zwei Schritte Fortschritt pro "Zwischenparken" (ein Wagen mehr steht auf dem korrekten Zielgleis als vorher), sodass der Algorithmus garantiert immer terminieren wird.
 
 
 ### Schriftlich-lautes Nachdenken

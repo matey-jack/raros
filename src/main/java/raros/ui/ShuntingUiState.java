@@ -8,7 +8,7 @@ public class ShuntingUiState {
     final int totalSteps;
 
     ShuntingState state = ShuntingState.SWITCHING_POINTS;
-    ShuntingStep currentStep = null;
+    ShuntingStep currentStep;
     int stepNumber = 0;
 
     public ShuntingUiState(ShuntingPlan plan) {
@@ -21,9 +21,7 @@ public class ShuntingUiState {
     // Returns 'true' on success and 'false' at the end of the plan.
     public boolean next() {
         switch (state) {
-            case SWITCHING_POINTS -> {
-                state = ShuntingState.DRIVING_IN;
-            }
+            case SWITCHING_POINTS -> state = ShuntingState.DRIVING_IN;
             case DRIVING_IN -> state = ShuntingState.COUPLING;
             case COUPLING -> state = ShuntingState.DRIVING_OUT;
             case DRIVING_OUT -> {

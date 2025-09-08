@@ -1,7 +1,5 @@
 package raros.plan;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-
 public enum RarosDataType {
     // TODO: put generic type instances here instead. (field will need a different type
     YARD_TRACKS_CAR_ORDER_GIVEN("yard-tracks-car-order/given", Tracks.class),

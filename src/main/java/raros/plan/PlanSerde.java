@@ -3,12 +3,11 @@ package raros.plan;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-import java.io.File;
 import java.nio.file.Path;
 
 // Serializer/Deserializer = writing and reading Json from the in-program data structures.
 public class PlanSerde {
-    ObjectMapper objectMapper = new ObjectMapper();
+    final ObjectMapper objectMapper = new ObjectMapper();
 
     PlanSerde() {
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
