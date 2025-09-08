@@ -11,7 +11,7 @@ import util.GermanList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static raros.Main.*;
+import static raros.MainTest.*;
 import static raros.drive.Infrastruktur_SG.RechteSeite;
 
 public class Example {

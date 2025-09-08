@@ -4,6 +4,7 @@ import de.tuberlin.bbi.dr.LayoutController;
 import de.tuberlin.bbi.dr.Turnout;
 import javafx.application.Platform;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,7 +28,7 @@ public class Switcher {
         dryRun = false;
     }
 
-    public void switchTo(String track, Consumer<List<String>> reportStatus, Runnable doneCallback) {
+    public void switchTo(String track, Consumer<List<String>> reportStatus, Runnable reportDone) {
         executor.submit(() -> {
             try {
                 var points = infrastruktur.fahrwegKonfiguration.get(Integer.parseInt(track));
@@ -48,7 +49,8 @@ public class Switcher {
                     Thread.sleep(1000);
                     done = switches.stream().allMatch(Switch::isDone);
                 } while (!done);
-                Platform.runLater(doneCallback);
+                Platform.runLater(() -> reportStatus.accept(createStatus(switches)));
+                Platform.runLater(reportDone);
             } catch (Throwable e) {
                 e.printStackTrace();
             }
@@ -56,7 +58,9 @@ public class Switcher {
     }
 
     private List<String> createStatus(List<Switch> switches) {
-        return switches.stream().map(Switch::toString).toList();
+        return switches.stream()
+                .sorted(Comparator.comparing(s -> s.weiche().weichenbezeichnung()))
+                .map(Switch::toString).toList();
     }
 
     record FakeTurnout(Position position) implements Turnout {

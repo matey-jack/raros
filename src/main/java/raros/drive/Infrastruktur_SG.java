@@ -17,10 +17,10 @@ public class Infrastruktur_SG {
     public static final int MIDDLE_TRACK_SECTION = 40;
 
     public static final Gleisharfe LinkeSeite = new Gleisharfe(Map.of(
-            1, Set.of(new FahrwegElement(W1, Position.CLOSED)),
+            1, Set.of(new FahrwegElement(W1, "W1", Position.CLOSED)),
             2, Set.of(
-                    new FahrwegElement(W1, Position.THROWN),
-                    new FahrwegElement(W2, Position.CLOSED)
+                    new FahrwegElement(W1, "W1", Position.THROWN),
+                    new FahrwegElement(W2, "W2", Position.CLOSED)
             )
     )) {
         public boolean initialize() {
@@ -39,18 +39,18 @@ public class Infrastruktur_SG {
 
     public static final Gleisharfe RechteSeite = new Gleisharfe(Map.of(
             2, Set.of(
-                    new FahrwegElement(W11, Position.THROWN),
-                    new FahrwegElement(W12, Position.CLOSED)
+                    new FahrwegElement(W11, "W11", Position.THROWN),
+                    new FahrwegElement(W12, "W12", Position.CLOSED)
             ),
             3, Set.of(
-                    new FahrwegElement(W11, Position.THROWN),
-                    new FahrwegElement(W12, Position.THROWN),
-                    new FahrwegElement(W13, Position.CLOSED)
+                    new FahrwegElement(W11, "W11", Position.THROWN),
+                    new FahrwegElement(W12, "W12", Position.THROWN),
+                    new FahrwegElement(W13, "W13", Position.CLOSED)
             ),
             4, Set.of(
-                    new FahrwegElement(W11, Position.THROWN),
-                    new FahrwegElement(W12, Position.THROWN),
-                    new FahrwegElement(W13, Position.THROWN)
+                    new FahrwegElement(W11, "W11", Position.THROWN),
+                    new FahrwegElement(W12, "W12", Position.THROWN),
+                    new FahrwegElement(W13, "W13", Position.THROWN)
             )
     )) {
         public boolean initialize() {

@@ -7,7 +7,7 @@ public class Driver {
         STOP(0),
         CREEP(45),
         NORMAL(90),
-        MAX(127);
+        MAX(125);
         final int speed;
 
         Speed(int speed) {

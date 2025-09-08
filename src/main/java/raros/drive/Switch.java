@@ -9,7 +9,7 @@ public record Switch(
     @Override
     public String toString() {
         var status = currentPosition() == weiche.turnoutPosition() ? "liegt richtig." : "wird umgelegt...";
-        return "Weiche " + weiche.turnoutId() + " auf " + weiche.positionText() + " " + status;
+        return "Weiche " + weiche.weichenbezeichnung() + " auf " + weiche.positionText() + " " + status;
     }
 
     public boolean isDone() {

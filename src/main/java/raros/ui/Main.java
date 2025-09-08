@@ -19,8 +19,7 @@ import raros.drive.Example;
 import raros.drive.Gleisharfe;
 import raros.drive.Switcher;
 
-import static raros.Main.ROTE_LOK;
-import static raros.Main.configureController;
+import static raros.MainTest.*;
 import static raros.drive.Infrastruktur_SG.RechteSeite;
 
 public class Main extends Application {
@@ -70,6 +69,7 @@ public class Main extends Application {
 
     @Override
     public void stop() throws Exception {
+        System.out.println("Window closed, stopping.");
         if (conn != null) {
             driver.stop();
             conn.getHandler().close();
@@ -79,7 +79,7 @@ public class Main extends Application {
 
     private Pane createInitScreen() {
         Button connectButton = new Button("Verbinden mit LokoNet");
-        connectButton.setOnAction(e -> {
+        connectButton.setOnAction(_e -> {
             connect();
             firstStep();
         });
@@ -98,7 +98,8 @@ public class Main extends Application {
     }
 
     public void setProgress() {
-        topStatus.setText("Rangierschritt " + (state.stepNumber + 1) + " von " + state.totalSteps + ".");
+        String mode = (conn==null) ? "TEST MODUS" : "LOCONET AKTIV";
+        topStatus.setText("[" + mode + "] Rangierschritt " + (state.stepNumber + 1) + " von " + state.totalSteps + ".");
     }
 
     public void next() {

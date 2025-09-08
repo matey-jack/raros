@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class Main {
+public class MainTest {
     public static final int ROTE_LOK = 6;
     public static final int BLAUE_LOK = 7;
 
@@ -41,7 +41,7 @@ public class Main {
         try {
             conn = configureController();
             if (conn.getHandler().isConnected()) {
-                LayoutController.addTrackSectionStateListener(Main::logTrackState);
+                LayoutController.addTrackSectionStateListener(MainTest::logTrackState);
                 //lokTest();
                 logAllTrackStates();
 
