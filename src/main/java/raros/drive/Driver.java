@@ -58,6 +58,7 @@ public class Driver {
 
     public void setVehicle(Vehicle vehicle) {
         this.vehicle = vehicle;
+        vehicle.setLight(Vehicle.Light.ON);
     }
 
     public void startCreeping() {

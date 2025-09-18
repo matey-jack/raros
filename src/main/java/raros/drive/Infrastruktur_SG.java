@@ -38,17 +38,19 @@ public class Infrastruktur_SG {
     private static final int W14 = 371;
 
     public static final Gleisharfe RechteSeite = new Gleisharfe(Map.of(
+            // "abbiegend" ("thrown") bestimmt sich nicht danach, ob es geradeaus geht,
+            // sondern nach den Ziffern 1 oder 0 an der Weiche!
             2, Set.of(
-                    new FahrwegElement(W11, "W11", Position.THROWN),
+                    new FahrwegElement(W11, "W11", Position.CLOSED),
                     new FahrwegElement(W12, "W12", Position.CLOSED)
             ),
             3, Set.of(
-                    new FahrwegElement(W11, "W11", Position.THROWN),
+                    new FahrwegElement(W11, "W11", Position.CLOSED),
                     new FahrwegElement(W12, "W12", Position.THROWN),
                     new FahrwegElement(W13, "W13", Position.CLOSED)
             ),
             4, Set.of(
-                    new FahrwegElement(W11, "W11", Position.THROWN),
+                    new FahrwegElement(W11, "W11", Position.CLOSED),
                     new FahrwegElement(W12, "W12", Position.THROWN),
                     new FahrwegElement(W13, "W13", Position.THROWN)
             )
