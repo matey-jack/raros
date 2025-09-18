@@ -82,7 +82,6 @@ public class Driver {
         if (this.speed == Speed.STOP) {
             return;
         }
-        this.speed = newSpeed;
         setVehicleSpeed(newSpeed);
     }
 
