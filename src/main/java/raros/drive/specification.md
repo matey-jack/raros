@@ -16,30 +16,33 @@ Weichen können automatisch gestellt werden und ihr Zustand abgefragt.
 b. Realisierbare Automatisierung
 --------------------------------
 
-Sowohl für das vorsichtige Anrücken an Wagen zum Kuppeln als auch das Bestimmen des Kehrpunktes auf dem Ausziehgleis ist ein menschlicher Mitarbeiter erforderlich. Dadurch wird die "automatisierte Rangierfahrt" eher zu einer "ferngesteuerten Rangierfahrt", was immerhin einen Mitarbeiter einspart.
+Sowohl für das vorsichtige Anrücken an Wagen zum Kuppeln als auch das Bestimmen des Kehrpunktes auf dem Ausziehgleis ist ein menschlicher Mitarbeiter erforderlich. 
+Dadurch wird die "automatisierte Rangierfahrt" eher zu einer "ferngesteuerten Rangierfahrt", was immerhin einen Mitarbeiter einspart.
 
 Wir schlagen daher folgendes Modell des Rangierprozesses vor:
  - Der Rangierbegleiter führt den Prozess mit einem Tablet aus. (Ersatzweise Steuerung per Laptop im Labor.)
- - Er steuert mit dem Tablet Fahrtrichtung und Geschwindigkeit der Lok.
+ - Er steuert mit dem Tablet die Geschwindigkeit der Lok.
+   * Bei der Fahrt ins Abstellgleis erfolgt dabei die Fahrt vollständig manuell, da die genaue Position der Wagen auf dem Gleis nicht bekannt ist. 
+   * Die Fahrt zurück ins Ausziehgleis erfolgt zunächst automatisch: Es wird so weit herausgefahren, wie zuvor hineingefahren wurde. Wegen der zusätzlichen Wagen an der Lok (und nicht-konstanter Geschwindigkeit, die zu signifikanten Fehlern in der Pseudo-Odometrie führt) muss aber ein Mensch prüfen, dass die Weichen frei gefahren wurden und bei Bedarf noch etwas weiter fahren.
  - Er sieht auf dem Tablet welche Wagen an- und abzukuppeln sind.
  - Wenn er das Kuppeln abgeschlossen hat bzw. auf dem Ausziehgleis die Weichen alle frei gefahren hat, bestätigt er das auf dem Tablet. Dann werden automatisch die Weichen umgestellt, geprüft und dann die nächste Fahrt freigegeben.
+ - Die Fahrtrichtung der Lok wird dabei vollständig automatisch bestimmt. Nur beim Kuppeln kann manuell langsam etwas vor- oder zurückgesetzt werden.
  - Da die Steuerung zentral erfolgt, kann man technisch sicherstellen, dass nicht gefahren wird, während die Weichen umgestellt werden und auch in dieser Zeit nicht losgefahren werden kann.
 
+Durch das automatische Zurücksetzen erspart man sich das Kalibrieren eines virtuellen Odometers.
 
 c. Driver UI
 ------------
 
 Leertaste = Stop oder Langsamfahrt (vielleicht so 19 aus 127?)
-Zifferntasten = Geschwindigkeit 19 + 12 * Ziffer. Also 0 ist genauso schnell wie Leertaste und 9 ist genau 127.
-    Alternativ die Buchstaben C V B N M, welche praktisch über der Leertaste liegen. C = Leertastenspeed, M = Max Speed.
+Zur Präsenzprüfung des Rbl muss die Taste (Leertaste oder Touchscreenbutton) gedrückt bleiben oder die Lok hält an.
+Die Geschwindigkeit kann ebenso nur verändert werden, wenn die Taste dabei gedrückt bleibt. 
+Dazu dienen die Tasten direkt über der Leertaste: C - Creep/Kriechgang, N - Normal, M - Maximal.
 
 Enter = Bestätigung des nächsten Rangier-Schritts. 
 Damit man hier nicht versehentlich vorzeitig draufhaut, soll vielleicht vorher die Bedingung bestätigt werden, durch:
  - Anklicken von "Weiche ist frei gefahren" oder
  - Anklicken aller Wagen, die an- oder abgekuppelt wurden.
-
-Mir gefällt, dass für die kritische Operation Maus und Tastatur verwendet werden. Aber halt! 
-Das bedeutet ja, dass wir um ein Fensterhaftes UI nicht herum kommen!?!?
 
 d. Anforderungen an Infrastruktur für verbesserte Automatisierung
 -----------------------------------------------------------------

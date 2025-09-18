@@ -56,7 +56,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
         drivingControls = new DrivingControls(driver, this::next);
-        couplingControls = new CouplingControls(driver, this::next);
+        couplingControls = new CouplingControls(driver, this::doneCoupling);
         switchControls = new SwitchControls(this::next);
 
         stage.setTitle("RaRoS Steuerung für Rangierbegleiter");
@@ -100,6 +100,15 @@ public class Main extends Application {
     public void setProgress() {
         String mode = (conn==null) ? "TEST MODUS" : "LOCONET AKTIV";
         topStatus.setText("[" + mode + "] Rangierschritt " + (state.stepNumber + 1) + " von " + state.totalSteps + ".");
+    }
+
+    public void doneCoupling() {
+        // TODO: maybe all of this should happen in the driving controls:
+        //          automatically set the speed on driving back out ...
+        //          and then we can show a timer for the remaining minimal driving time.
+        //      After that time, go into creep mode and enable the "done" button.
+        driver.driveBack();
+        next();
     }
 
     public void next() {

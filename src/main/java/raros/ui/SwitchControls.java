@@ -15,7 +15,7 @@ public class SwitchControls {
 
     SwitchControls(Runnable next) {
         this.next = next;
-        confirmButton.setOnAction(e -> next.run());
+        confirmButton.setOnAction(_ -> next.run());
         reset();
     }
 

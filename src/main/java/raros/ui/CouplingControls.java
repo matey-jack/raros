@@ -16,6 +16,9 @@ public class CouplingControls {
     final Runnable next;
     final Pane root;
     private final Label instructions = new Label();
+    private final Button creepFwdButton = new Button("Schieben");
+    private final Button creepBackButton = new Button("Ziehen");
+    private final Button doneButton = new Button("Fertig");
 
     public CouplingControls(Driver driver, Runnable next) {
         this.driver = driver;
@@ -23,26 +26,33 @@ public class CouplingControls {
 
         var title = new Label("Wagen kuppeln");
 
-        var creepFwdButton = new Button("Schieben");
         creepFwdButton.armedProperty().addListener((obs, was, is) -> {
                     if (is) driver.creepForward();
                 }
         );
         creepFwdButton.setOnAction(e -> driver.stop());
 
-        var creepBackButton = new Button("Ziehen");
         creepBackButton.armedProperty().addListener((obs, was, is) -> {
             if (is) driver.creepBackward();
         });
         creepBackButton.setOnAction(e -> driver.stop());
         var creepBox = new HBox(creepFwdButton, creepBackButton);
 
-        var doneButton = new Button("Fertig");
-        doneButton.setOnAction(e -> next.run());
+        doneButton.setOnAction(e -> driveBack());
         root = new VBox(title, instructions, creepBox, doneButton);
     }
 
+    private void driveBack() {
+        creepFwdButton.setDisable(true);
+        creepBackButton.setDisable(true);
+        doneButton.setDisable(true);
+        next.run();
+    }
+
     public void setStep(ShuntingStep step) {
+        creepFwdButton.setDisable(false);
+        creepBackButton.setDisable(false);
+        doneButton.setDisable(false);
         if (step instanceof Drop d) {
             var ankuppeln = d.couple() ? ", an vorhandene Wagen ankuppeln " : "";
             instructions.setText(
