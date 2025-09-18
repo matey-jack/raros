@@ -26,7 +26,7 @@ public class DrivingControls {
     private final Label remainingTime = new Label();
     private final Button doneButton;
     private final Button confirmClearButton;
-    private Map<Driver.Speed, Label> speedLabels = Map.of(
+    private final Map<Driver.Speed, Label> speedLabels = Map.of(
             Driver.Speed.CREEP, new Label("C - Creep/Kriechgang"),
             Driver.Speed.NORMAL, new Label("N - Normal"),
             Driver.Speed.MAX, new Label("M - Maximal")
@@ -82,7 +82,10 @@ public class DrivingControls {
         );
         // this is button released.
         // Driver has to be smart and stop automatic or manual driving whichever is happening.
-        button.setOnAction(e -> driver.stop());
+        button.setOnAction(e -> {
+            driver.stop();
+            showSpeed(Driver.Speed.CREEP);
+        });
         // speed letters
         button.setOnKeyPressed(e -> {
             var speed = switch (e.getCode()) {
@@ -119,6 +122,7 @@ public class DrivingControls {
                 title.setText("Fahrt ins Ausziehgleis");
                 doneButton.setText("Kehren");
                 doneButton.setDisable(true);
+                setRemainingTime((int) (driver.getTotalRemainingMillis() / 1000), Driver.Speed.CREEP);
                 remainingTime.setVisible(true);
                 driver.setDirection(Vehicle.Direction.REVERSE);
             }

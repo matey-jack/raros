@@ -42,17 +42,17 @@ public class Infrastruktur_SG {
             // sondern nach den Ziffern 1 oder 0 an der Weiche!
             2, Set.of(
                     new FahrwegElement(W11, "W11", Position.CLOSED),
-                    new FahrwegElement(W12, "W12", Position.CLOSED)
+                    new FahrwegElement(W12, "W12", Position.THROWN)
             ),
             3, Set.of(
                     new FahrwegElement(W11, "W11", Position.CLOSED),
-                    new FahrwegElement(W12, "W12", Position.THROWN),
-                    new FahrwegElement(W13, "W13", Position.CLOSED)
+                    new FahrwegElement(W12, "W12", Position.CLOSED),
+                    new FahrwegElement(W13, "W13", Position.THROWN)
             ),
             4, Set.of(
                     new FahrwegElement(W11, "W11", Position.CLOSED),
-                    new FahrwegElement(W12, "W12", Position.THROWN),
-                    new FahrwegElement(W13, "W13", Position.THROWN)
+                    new FahrwegElement(W12, "W12", Position.CLOSED),
+                    new FahrwegElement(W13, "W13", Position.CLOSED)
             )
     )) {
         public boolean initialize() {

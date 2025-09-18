@@ -71,7 +71,7 @@ public class Driver {
     }
 
     public void stop() {
-
+        automaticDrive = false;
         setVehicleSpeed(Speed.STOP);
     }
 
@@ -91,6 +91,7 @@ public class Driver {
             long time = System.currentTimeMillis();
             if (speed != Speed.STOP) {
                 long elapsed = time - onSpeedSince;
+                System.out.println("Driven " + elapsed + " milliseconds at " + speed.toString() + ".");
                 drivenMilliSeconds.add(new Pair<>(speed, elapsed));
             }
             onSpeedSince = time;
@@ -122,12 +123,13 @@ public class Driver {
         executor.submit(() -> {
             try {
                 setDirection(Vehicle.Direction.REVERSE);
-                long totalRemaining = drivenMilliSeconds.stream().mapToLong(Pair::getValue).sum();
+                long totalRemaining = getTotalRemainingMillis();
                 while (automaticDrive && !drivenMilliSeconds.isEmpty()) {
                     var currentSpeed = drivenMilliSeconds.getLast().getKey();
                     var currentInterval = drivenMilliSeconds.getLast().getValue();
                     var startTime = System.currentTimeMillis();
                     long elapsed = 0;
+                    System.out.println("Will drive " + currentInterval + " milliseconds at " + currentSpeed.toString() + ".");
                     setVehicleSpeed(currentSpeed);
                     while (automaticDrive && elapsed < currentInterval) {
                         elapsed = System.currentTimeMillis() - startTime;
@@ -153,5 +155,9 @@ public class Driver {
                 setVehicleSpeed(Speed.STOP);
             }
         });
+    }
+
+    public long getTotalRemainingMillis() {
+        return drivenMilliSeconds.stream().mapToLong(Pair::getValue).sum();
     }
 }

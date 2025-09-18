@@ -62,7 +62,7 @@ public class Main extends Application {
         stage.setTitle("RaRoS Steuerung für Rangierbegleiter");
 
         root.getChildren().add(createInitScreen());
-        scene = new Scene(root, 450, 300);
+        scene = new Scene(root, 500, 230);
         stage.setScene(scene);
         stage.show();
     }
@@ -127,65 +127,4 @@ public class Main extends Application {
             }
         }
     }
-
-    public void startGPT(Stage stage) {
-        // Controls
-        var cbA = new CheckBox("Enable A");
-        var cbB = new CheckBox("Enable B");
-
-        var runBtn = new Button("Run");
-        var clearBtn = new Button("Clear");
-        var exitBtn = new Button("Exit");
-
-        var output = new TextArea();
-        output.setEditable(false);
-        output.setWrapText(true);
-        output.setPrefRowCount(6);
-
-        // Simple status text bound to checkbox state
-        var status = new Label();
-        status.textProperty().bind(
-                Bindings.createStringBinding(
-                        () -> (cbA.isSelected() || cbB.isSelected())
-                                ? "Status: ready"
-                                : "Status: select at least one option",
-                        cbA.selectedProperty(), cbB.selectedProperty()
-                )
-        );
-
-        // Disable "Run" until something is selected
-        runBtn.disableProperty().bind(
-                cbA.selectedProperty().not().and(cbB.selectedProperty().not())
-        );
-
-        // Actions
-        runBtn.setOnAction(e -> {
-            var sb = new StringBuilder("Running with:\n");
-            if (cbA.isSelected()) sb.append(" • A\n");
-            if (cbB.isSelected()) sb.append(" • B\n");
-            sb.append("Time: ").append(java.time.LocalTime.now()).append("\n\n");
-            output.appendText(sb.toString());
-        });
-
-        clearBtn.setOnAction(e -> output.clear());
-        exitBtn.setOnAction(e -> stage.close());
-
-        // Layout
-        var options = new HBox(12, cbA, cbB);
-        var buttons = new HBox(12, runBtn, clearBtn, exitBtn);
-        var root = new VBox(12,
-                new Label("Simple Control Panel"),
-                options,
-                buttons,
-                new Label("Output:"),
-                output,
-                status
-        );
-        root.setPadding(new Insets(16));
-
-        stage.setTitle("My JavaFX Window");
-        stage.setScene(new Scene(root, 420, 300));
-        stage.show();
-    }
-
 }
