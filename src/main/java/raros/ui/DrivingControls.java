@@ -47,15 +47,14 @@ public class DrivingControls {
         doneButton = new Button("Fertig");
         doneButton.setOnAction(this::onDone);
         var doneBox = new HBox(doneButton, confirmClearButton);
-        // TODO: make this an option list or at least several labels, so that the current speed can be shown
-        //      (in bold font or similar).
         Label speedsLabel = new Label("Geschwindigkeiten:");
         HBox speedsBox = new HBox(speedsLabel);
         for (var s : Driver.Speed.values()) {
             var l = speedLabels.get(s);
             if (l != null) speedsBox.getChildren().add(l);
         }
-        root = new VBox(title, speedsLabel, drivingButton, remainingTime, doneBox);
+        speedsBox.setSpacing(16);
+        root = new VBox(title, speedsBox, drivingButton, remainingTime, doneBox);
         root.setPadding(new Insets(16));
     }
 

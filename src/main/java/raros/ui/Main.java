@@ -62,7 +62,7 @@ public class Main extends Application {
         stage.setTitle("RaRoS Steuerung für Rangierbegleiter");
 
         root.getChildren().add(createInitScreen());
-        scene = new Scene(root, 420, 300);
+        scene = new Scene(root, 450, 300);
         stage.setScene(scene);
         stage.show();
     }

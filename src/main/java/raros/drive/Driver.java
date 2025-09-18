@@ -1,6 +1,7 @@
 package raros.drive;
 
 import de.tuberlin.bbi.dr.Vehicle;
+import javafx.application.Platform;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class Driver {
         STOP(0),
         CREEP(45),
         NORMAL(90),
-        MAX(125);
+        MAX(120);
         final int speed;
 
         Speed(int speed) {
@@ -130,17 +131,19 @@ public class Driver {
                     setVehicleSpeed(currentSpeed);
                     while (automaticDrive && elapsed < currentInterval) {
                         elapsed = System.currentTimeMillis() - startTime;
-                        remaining.accept((int) ((totalRemaining - elapsed) / 1000), currentSpeed);
+                        final int currentlyRemaining = (int) ((totalRemaining - elapsed) / 1000);
+                        Platform.runLater(() -> remaining.accept(currentlyRemaining, currentSpeed));
                         TimeUnit.MILLISECONDS.sleep(10);
                     }
                     drivenMilliSeconds.removeLast();
+                    totalRemaining -= elapsed;
                     if (elapsed < currentInterval) {
                         // in this case, automaticDrive must be false and the outer loop will exit
                         drivenMilliSeconds.add(new Pair<>(currentSpeed, currentInterval - elapsed));
                     }
                 }
                 if (drivenMilliSeconds.isEmpty()) {
-                    done.run();
+                    Platform.runLater(done);
                 }
             } catch (InterruptedException e) {
                 System.out.println();
